@@ -1,3 +1,16 @@
+# Lizzie -Local Analysis
+This is an extension for [Lizzie](https://github.com/featurecat/lizzie). To use it open Lizzie and push **j**. 
+Now you can click on two fields on the board which will select the area and build a position in which 
+Katago is forced to think about the selected area. 
+The selectected rectangle will be cut off and the remaining area will be filled with stones.
+This way a local analyses is possible without calculating anything outside of the selected area. 
+It's the first release, so i expect many bugs. 
+Feel free to report them and ask further questions.
+Also, feel free to suggest improvements on the coding, because it's my first project. 
+Updated versions are planned. 
+Probably, it will only work with Windows. 
+
+
 # Lizzie - Leela Zero Interface
 
 ![screenshot](https://raw.githubusercontent.com/featurecat/lizzie/master/screenshot0.7.jpg?raw=true)
