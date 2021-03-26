@@ -6,9 +6,6 @@ import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.analysis.YaZenGtp;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
-import featurecat.lizzie.util.DigitOnlyFilter;
-import la.LocalAnalysisDialog;
-
 import java.awt.BorderLayout;
 import java.awt.FileDialog;
 import java.awt.Font;
@@ -19,26 +16,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
-import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DocumentFilter;
-import javax.swing.text.InternationalFormatter;
-
-import org.json.JSONObject;
-
 import la.LocalAnalysisFrame;
+import org.json.JSONObject;
 
 public abstract class MainFrame extends JFrame {
   public static final ResourceBundle resourceBundle =
@@ -61,7 +48,7 @@ public abstract class MainFrame extends JFrame {
   public boolean isShowingRightMenu = false;
   public ToolBar toolBar;
   public boolean isShowingPolicy = false;
-  
+
   public LocalAnalysisFrame localAnalysisFrame;
 
   static {
@@ -387,11 +374,11 @@ public abstract class MainFrame extends JFrame {
       estimateByZen();
     }
   }
-  
+
   public void startLocalAnalysis() {
     localAnalysisFrame = new LocalAnalysisFrame();
-	localAnalysisFrame.start();  
- }
+    localAnalysisFrame.start();
+  }
 
   public abstract boolean playCurrentVariation();
 

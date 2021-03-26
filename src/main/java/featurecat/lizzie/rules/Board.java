@@ -64,7 +64,7 @@ public class Board implements LeelazListener {
   public Board() {
     initialize();
   }
-  
+
   /** Initialize the board completely */
   private void initialize() {
     capturedStones = new Stone[] {};

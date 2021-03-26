@@ -220,14 +220,14 @@ public class ConfigDialog extends JDialog {
   public JButton btnWhiteStonePath;
   public JPanel pnlBoardPreview;
   JTabbedPane tabbedPane;
-  
+
   // Local Analysis Tab
   private JFormattedTextField txtMaxAlivePoints;
   private JFormattedTextField txtWallDistance;
   private JCheckBox chkAllowKo;
   private JCheckBox chkShowStartDialog;
-  private JComboBox <String> jcbPlayerInside;
-  private JComboBox <String> jcbPlayerToMove;
+  private JComboBox<String> jcbPlayerInside;
+  private JComboBox<String> jcbPlayerToMove;
 
   public ConfigDialog() {
     setTitle(resourceBundle.getString("LizzieConfig.title.config"));
@@ -675,8 +675,7 @@ public class ConfigDialog extends JDialog {
     themeTab = new JPanel();
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, themeTab, null);
     themeTab.setLayout(null);
-    
-   	    
+
     // About Tab
     aboutTab = new JPanel();
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.about"), null, aboutTab, null);
@@ -1204,109 +1203,107 @@ public class ConfigDialog extends JDialog {
     tpGtpConsoleStyle = new JTextPane();
     tpGtpConsoleStyle.setBounds(170, 446, 460, 80);
     uiTab.add(tpGtpConsoleStyle);
-    
+
     // Local Analysis Tab
- 	localAnalysisTab = new JPanel();
- 	tabbedPane.addTab("localAnalysis", null, localAnalysisTab, null);
- 	localAnalysisTab.setLayout(null);
+    localAnalysisTab = new JPanel();
+    tabbedPane.addTab("localAnalysis", null, localAnalysisTab, null);
+    localAnalysisTab.setLayout(null);
 
- 	JLabel lblAllowKo =
- 	    new JLabel("Allow Ko");
- 	lblAllowKo.setBounds(11, 75, 157, 16);
- 	localAnalysisTab.add(lblAllowKo);
- 	chkAllowKo = new JCheckBox("");
- 	chkAllowKo.addChangeListener(
- 	    new ChangeListener() {
- 	      public void stateChanged(ChangeEvent e) {
- 	        if (chkAllowKo.isSelected() != Lizzie.config.allowKo) {
- 	          Lizzie.config.toggleAllowKo();
- 	          Lizzie.frame.refresh(4);
- 	        }
- 	      }
- 	    });
- 	chkAllowKo.setBounds(170, 72, 57, 23);
- 	localAnalysisTab.add(chkAllowKo);
- 	
- 	JLabel lblshowLocalAnalysisStartDialog =
- 	    new JLabel("Show Start Dialog");
- 	lblshowLocalAnalysisStartDialog.setBounds(300, 75, 210, 16);
- 	localAnalysisTab.add(lblshowLocalAnalysisStartDialog);
- 	chkShowStartDialog = new JCheckBox("");
- 	chkShowStartDialog.addChangeListener(
- 	    new ChangeListener() {
- 	        public void stateChanged(ChangeEvent e) {
- 	            if (chkShowStartDialog.isSelected() != Lizzie.config.showLocalAnalysisStartDialog) {
- 	              Lizzie.config.toggleStartPonderImmediately();
- 	              Lizzie.frame.refresh(4);
- 	            }
- 	        }
- 	    });
- 	chkShowStartDialog.setBounds(536, 72, 57, 23);
- 	localAnalysisTab.add(chkShowStartDialog);
- 	    
- 	JLabel lblMaxAlivePoints =
- 	    new JLabel("Maximal Alive Points");
- 	lblMaxAlivePoints.setBounds(6, 370, 157, 16);
- 	localAnalysisTab.add(lblMaxAlivePoints);	   		
- 	txtMaxAlivePoints =
- 	    new JFormattedTextField(
- 		    new InternationalFormatter(nf) {
- 		        protected DocumentFilter getDocumentFilter() {
- 		            return filter;
- 		        }
+    JLabel lblAllowKo = new JLabel("Allow Ko");
+    lblAllowKo.setBounds(11, 75, 157, 16);
+    localAnalysisTab.add(lblAllowKo);
+    chkAllowKo = new JCheckBox("");
+    chkAllowKo.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (chkAllowKo.isSelected() != Lizzie.config.allowKo) {
+              Lizzie.config.toggleAllowKo();
+              Lizzie.frame.refresh(4);
+            }
+          }
+        });
+    chkAllowKo.setBounds(170, 72, 57, 23);
+    localAnalysisTab.add(chkAllowKo);
 
- 		        private DocumentFilter filter = new DigitOnlyFilter();
- 		    });
- 	txtMaxAlivePoints.setBounds(171, 365, 40, 26);
- 	localAnalysisTab.add(txtMaxAlivePoints);
- 	txtMaxAlivePoints.setColumns(10);
- 	txtMaxAlivePoints.setText(String.valueOf(Lizzie.config.la.getInt("max-alive-points")));
+    JLabel lblshowLocalAnalysisStartDialog = new JLabel("Show Start Dialog");
+    lblshowLocalAnalysisStartDialog.setBounds(300, 75, 210, 16);
+    localAnalysisTab.add(lblshowLocalAnalysisStartDialog);
+    chkShowStartDialog = new JCheckBox("");
+    chkShowStartDialog.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (chkShowStartDialog.isSelected() != Lizzie.config.showLocalAnalysisStartDialog) {
+              Lizzie.config.toggleStartPonderImmediately();
+              Lizzie.frame.refresh(4);
+            }
+          }
+        });
+    chkShowStartDialog.setBounds(536, 72, 57, 23);
+    localAnalysisTab.add(chkShowStartDialog);
 
-    JLabel lblWallDistance =
- 	    new JLabel("Wall Distance");
+    JLabel lblMaxAlivePoints = new JLabel("Maximal Alive Points");
+    lblMaxAlivePoints.setBounds(6, 370, 157, 16);
+    localAnalysisTab.add(lblMaxAlivePoints);
+    txtMaxAlivePoints =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtMaxAlivePoints.setBounds(171, 365, 40, 26);
+    localAnalysisTab.add(txtMaxAlivePoints);
+    txtMaxAlivePoints.setColumns(10);
+    txtMaxAlivePoints.setText(String.valueOf(Lizzie.config.la.getInt("max-alive-points")));
+
+    JLabel lblWallDistance = new JLabel("Wall Distance");
     lblWallDistance.setBounds(6, 400, 157, 16);
- 	localAnalysisTab.add(lblWallDistance);
- 	txtWallDistance =
- 	    new JFormattedTextField(
- 	        new InternationalFormatter(nf) {
- 	            protected DocumentFilter getDocumentFilter() {
- 	                return filter;
- 	            }
+    localAnalysisTab.add(lblWallDistance);
+    txtWallDistance =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
 
- 	            private DocumentFilter filter = new DigitOnlyFilter();
- 	        });
- 	txtWallDistance.setColumns(10);
- 	txtWallDistance.setBounds(171, 395, 40, 26);
- 	localAnalysisTab.add(txtWallDistance);
- 	txtWallDistance.setText(String.valueOf(Lizzie.config.la.getInt("wall-distance")));
- 		    
- 	String[] playerInsideList = {"Dialog", "Automatic", "Black", "White"};
- 	JLabel lblPlayerInside = new JLabel("Inside Player");
- 	lblPlayerInside.setBounds(10, 11, 163, 20);
- 	localAnalysisTab.add(lblPlayerInside);
- 	jcbPlayerInside = new JComboBox <String>(playerInsideList);
- 	jcbPlayerInside.addActionListener(
- 	    new ActionListener() {
- 	        public void actionPerformed(ActionEvent e) {
- 	            Lizzie.config.setPlayerInside(jcbPlayerInside.getSelectedIndex());
- 	        }
- 	    });
- 	jcbPlayerInside.setBounds(175, 11, 199, 20);
- 	localAnalysisTab.add(jcbPlayerInside);
- 	     
- 	String[] playerToMoveList = {"Dialog", "Black", "White", "Same player as before", "Inside player", "Outside player"};
-	JLabel lblPlayerToMove = new JLabel("Player to move");
-	lblPlayerToMove.setBounds(10, 41, 163, 20);
-	localAnalysisTab.add(lblPlayerToMove);
-	jcbPlayerToMove = new JComboBox(playerToMoveList);
-	jcbPlayerToMove.addActionListener(
-	    new ActionListener() {
-	        public void actionPerformed(ActionEvent e) {
-	            Lizzie.config.setPlayerToMove(jcbPlayerToMove.getSelectedIndex());
-	        }
-	    });
-	jcbPlayerToMove.setBounds(175, 41, 199, 20);
-	localAnalysisTab.add(jcbPlayerToMove);
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtWallDistance.setColumns(10);
+    txtWallDistance.setBounds(171, 395, 40, 26);
+    localAnalysisTab.add(txtWallDistance);
+    txtWallDistance.setText(String.valueOf(Lizzie.config.la.getInt("wall-distance")));
+
+    String[] playerInsideList = {"Dialog", "Automatic", "Black", "White"};
+    JLabel lblPlayerInside = new JLabel("Inside Player");
+    lblPlayerInside.setBounds(10, 11, 163, 20);
+    localAnalysisTab.add(lblPlayerInside);
+    jcbPlayerInside = new JComboBox<String>(playerInsideList);
+    jcbPlayerInside.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            Lizzie.config.setPlayerInside(jcbPlayerInside.getSelectedIndex());
+          }
+        });
+    jcbPlayerInside.setBounds(175, 11, 199, 20);
+    localAnalysisTab.add(jcbPlayerInside);
+
+    String[] playerToMoveList = {
+      "Dialog", "Black", "White", "Same player as before", "Inside player", "Outside player"
+    };
+    JLabel lblPlayerToMove = new JLabel("Player to move");
+    lblPlayerToMove.setBounds(10, 41, 163, 20);
+    localAnalysisTab.add(lblPlayerToMove);
+    jcbPlayerToMove = new JComboBox(playerToMoveList);
+    jcbPlayerToMove.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            Lizzie.config.setPlayerToMove(jcbPlayerToMove.getSelectedIndex());
+          }
+        });
+    jcbPlayerToMove.setBounds(175, 41, 199, 20);
+    localAnalysisTab.add(jcbPlayerToMove);
 
     setBoardSize();
     setShowMoveNumber();

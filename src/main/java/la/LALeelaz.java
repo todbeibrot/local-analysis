@@ -1,7 +1,7 @@
 package la;
 
-import featurecat.lizzie.analysis.*;
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.analysis.*;
 import featurecat.lizzie.gui.MainFrame;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
@@ -104,7 +104,7 @@ public class LALeelaz {
    *
    * @throws IOException
    */
-  public LALeelaz(String notUsed) throws JSONException {	
+  public LALeelaz(String notUsed) throws JSONException {
     board = new Board();
     bestMoves = new ArrayList<>();
     bestMovesTemp = new ArrayList<>();
@@ -118,9 +118,9 @@ public class LALeelaz {
 
     // Move config to member for other method call
     config = Lizzie.config.config.getJSONObject("leelaz");
-    
+
     String engineCommand = config.getString("engine-command");
-	engineCommand = engineCommand.replaceAll("%network-file", config.getString("network-file"));
+    engineCommand = engineCommand.replaceAll("%network-file", config.getString("network-file"));
 
     printCommunication = config.getBoolean("print-comms");
     gtpConsole = printCommunication;
@@ -212,7 +212,9 @@ public class LALeelaz {
     // Response handled in parseLine
     isCheckingVersion = true;
     sendCommand("version");
-    boardSize(Lizzie.frame.localAnalysisFrame.board.boardWidth, Lizzie.frame.localAnalysisFrame.board.boardHeight);
+    boardSize(
+        Lizzie.frame.localAnalysisFrame.board.boardWidth,
+        Lizzie.frame.localAnalysisFrame.board.boardHeight);
     komi(Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getKomi());
 
     // start a thread to continuously read Leelaz output
@@ -245,7 +247,10 @@ public class LALeelaz {
     Lizzie.frame.localAnalysisFrame.refresh();
     String displayedMessage = String.format("%s\n\nEngine command: %s", message, engineCommand);
     JOptionPane.showMessageDialog(
-        Lizzie.frame.localAnalysisFrame, displayedMessage, "Lizzie - Error!", JOptionPane.ERROR_MESSAGE);
+        Lizzie.frame.localAnalysisFrame,
+        displayedMessage,
+        "Lizzie - Error!",
+        JOptionPane.ERROR_MESSAGE);
   }
 
   public void normalQuit() {
@@ -389,7 +394,8 @@ public class LALeelaz {
         isLoaded = true;
         if (isResponseUpToDate()
             || isThinking
-                && (!isPondering && Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz || isInputCommand)) {
+                && (!isPondering && Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
+                    || isInputCommand)) {
           // TODO Do not update the best moves when playing against Leela Zero
           // Because it is equivalent to the winrate of the previous move.
           if (!Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
@@ -422,9 +428,17 @@ public class LALeelaz {
         if (isSettingHandicap) {
           bestMoves = new ArrayList<>();
           for (int i = 1; i < params.length; i++) {
-            Lizzie.frame.localAnalysisFrame.board
+            Lizzie.frame
+                .localAnalysisFrame
+                .board
                 .asCoordinates(params[i])
-                .ifPresent(coords -> Lizzie.frame.localAnalysisFrame.board.getHistory().setStone(coords, Stone.BLACK));
+                .ifPresent(
+                    coords ->
+                        Lizzie.frame
+                            .localAnalysisFrame
+                            .board
+                            .getHistory()
+                            .setStone(coords, Stone.BLACK));
           }
           isSettingHandicap = false;
         } else if (isThinking && !isPondering) {
@@ -449,7 +463,7 @@ public class LALeelaz {
         } else if (isCheckingName) {
           if (params[1].startsWith("KataGo")) {
             this.isKataGo = true;
-            //Lizzie.initializeAfterVersionCheck(this);
+            // Lizzie.initializeAfterVersionCheck(this);
           }
           isCheckingName = false;
         } else if (isCheckingVersion && !isKataGo) {
@@ -464,7 +478,7 @@ public class LALeelaz {
                     + ")");
           }
           isCheckingVersion = false;
-          //Lizzie.initializeAfterVersionCheck(this);
+          // Lizzie.initializeAfterVersionCheck(this);
         }
       }
     }
@@ -480,7 +494,8 @@ public class LALeelaz {
     // ignore passes, and only accept lines that start with a coordinate letter
     if (line.length() > 0 && Character.isLetter(line.charAt(0)) && !line.startsWith("pass")) {
       if (!(Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
-          && Lizzie.frame.localAnalysisFrame.playerIsBlack != Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay)) {
+          && Lizzie.frame.localAnalysisFrame.playerIsBlack
+              != Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay)) {
         try {
           bestMovesTemp.add(MoveData.fromInfo(line));
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -730,7 +745,9 @@ public class LALeelaz {
   public void ponder() {
     isPondering = true;
     startPonderTime = System.currentTimeMillis();
-    if (Lizzie.frame.localAnalysisFrame.board.isAvoding && Lizzie.frame.localAnalysisFrame.board.isKeepingAvoid && !isKataGo)
+    if (Lizzie.frame.localAnalysisFrame.board.isAvoding
+        && Lizzie.frame.localAnalysisFrame.board.isKeepingAvoid
+        && !isKataGo)
       analyzeAvoid(
           "avoid b "
               + Lizzie.frame.localAnalysisFrame.board.avoidCoords
@@ -807,7 +824,8 @@ public class LALeelaz {
       // copy the list to avoid concurrent modification exception... TODO there must be a better way
       // (note the concurrent modification exception is very very rare)
       // We should use Lizzie Board's best moves as they will generally be the most accurate
-      final List<MoveData> moves = new ArrayList<MoveData>(Lizzie.frame.localAnalysisFrame.board.getData().bestMoves);
+      final List<MoveData> moves =
+          new ArrayList<MoveData>(Lizzie.frame.localAnalysisFrame.board.getData().bestMoves);
 
       // get the total number of playouts in moves
       int totalPlayouts = moves.stream().mapToInt(move -> move.playouts).sum();

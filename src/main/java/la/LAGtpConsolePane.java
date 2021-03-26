@@ -1,7 +1,7 @@
 package la;
 
-import featurecat.lizzie.gui.*;
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.gui.*;
 import featurecat.lizzie.util.WindowPosition;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -79,7 +79,10 @@ public class LAGtpConsolePane extends JDialog {
     lblCommand.setOpaque(true);
     lblCommand.setBackground(Color.DARK_GRAY);
     lblCommand.setForeground(Color.WHITE);
-    lblCommand.setText(Lizzie.frame.localAnalysisFrame.leelaz == null ? "GTP>" : Lizzie.frame.localAnalysisFrame.leelaz.currentShortWeight() + ">");
+    lblCommand.setText(
+        Lizzie.frame.localAnalysisFrame.leelaz == null
+            ? "GTP>"
+            : Lizzie.frame.localAnalysisFrame.leelaz.currentShortWeight() + ">");
     pnlCommand.setLayout(new BorderLayout(0, 0));
     pnlCommand.add(lblCommand, BorderLayout.WEST);
     pnlCommand.add(txtCommand);
@@ -96,7 +99,10 @@ public class LAGtpConsolePane extends JDialog {
     if (command == null || command.trim().length() == 0) {
       return;
     }
-    lblCommand.setText(Lizzie.frame.localAnalysisFrame.leelaz == null ? "GTP>" : Lizzie.frame.localAnalysisFrame.leelaz.currentShortWeight() + ">");
+    lblCommand.setText(
+        Lizzie.frame.localAnalysisFrame.leelaz == null
+            ? "GTP>"
+            : Lizzie.frame.localAnalysisFrame.leelaz.currentShortWeight() + ">");
     this.command = command;
     this.isAnalyzeCommand =
         command.startsWith("lz-analyze")
@@ -161,7 +167,9 @@ public class LAGtpConsolePane extends JDialog {
   public String formatCommand(String command, int commandNumber) {
     return String.format(
         "<span class=\"command\">"
-            + (Lizzie.frame.localAnalysisFrame.leelaz == null ? "GTP" : Lizzie.frame.localAnalysisFrame.leelaz.currentShortWeight())
+            + (Lizzie.frame.localAnalysisFrame.leelaz == null
+                ? "GTP"
+                : Lizzie.frame.localAnalysisFrame.leelaz.currentShortWeight())
             + "> %d %s </span><br />",
         commandNumber,
         command);
@@ -194,7 +202,8 @@ public class LAGtpConsolePane extends JDialog {
         String cmdParams[] = command.split(" ");
         if (cmdParams.length >= 2) {
           String param1 = cmdParams[1].toUpperCase();
-          boolean needPass = (Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay != "B".equals(param1));
+          boolean needPass =
+              (Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay != "B".equals(param1));
           if (needPass) {
             Lizzie.frame.localAnalysisFrame.board.pass();
           }

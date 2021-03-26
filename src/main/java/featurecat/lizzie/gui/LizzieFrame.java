@@ -1497,7 +1497,7 @@ public class LizzieFrame extends MainFrame {
     countResults.button.setText(resourceBundle.getString("CountDialog.estimateButton.clickone"));
     if (byToolBar) countResults.setVisible(false);
   }
-   
+
   public void updateEngineMenu(List<Leelaz> engineList) {
     menu.updateEngineMenu(engineList);
   }

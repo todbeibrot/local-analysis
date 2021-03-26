@@ -3,11 +3,10 @@ package la;
 import static java.lang.Math.min;
 import static java.util.Collections.singletonList;
 
-import featurecat.lizzie.rules.*;
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.analysis.LeelazListener;
 import featurecat.lizzie.analysis.MoveData;
+import featurecat.lizzie.rules.*;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -27,11 +26,11 @@ import org.json.JSONException;
 
 public class LABoard extends Board implements LeelazListener {
   public static int boardSize0 = 19;
-//      (Lizzie.config != null
-//              && Lizzie.config.config != null
-//              && Lizzie.config.config.getJSONObject("ui") != null)
-//          ? Lizzie.config.config.getJSONObject("ui").optInt("board-size", 19)
-//          : 19;
+  //      (Lizzie.config != null
+  //              && Lizzie.config.config != null
+  //              && Lizzie.config.config.getJSONObject("ui") != null)
+  //          ? Lizzie.config.config.getJSONObject("ui").optInt("board-size", 19)
+  //          : 19;
   public static int boardWidth =
       (Lizzie.config != null
               && Lizzie.config.config != null
@@ -65,15 +64,15 @@ public class LABoard extends Board implements LeelazListener {
   public LABoard() {
     initialize();
   }
-//  
-//  public LABoard (Board board) {
-//    capturedStones = board.getStones();
-//    scoreMode = false;
-//    analysisMode = false;
-//    playoutsAnalysis = 100;
-//    saveNode = Optional.empty();
-//    history = board.getHistory().shallowCopy();	  
-//  }
+  //
+  //  public LABoard (Board board) {
+  //    capturedStones = board.getStones();
+  //    scoreMode = false;
+  //    analysisMode = false;
+  //    playoutsAnalysis = 100;
+  //    saveNode = Optional.empty();
+  //    history = board.getHistory().shallowCopy();
+  //  }
 
   /** Initialize the board completely */
   private void initialize() {
@@ -82,27 +81,28 @@ public class LABoard extends Board implements LeelazListener {
     analysisMode = false;
     playoutsAnalysis = 100;
     saveNode = Optional.empty();
-    history = new BoardHistoryList(BoardData.empty(boardWidth, boardHeight)); 
+    history = new BoardHistoryList(BoardData.empty(boardWidth, boardHeight));
   }
-  
-  /**
-   * copies the board position for the local analysis frame
-   */
+
+  /** copies the board position for the local analysis frame */
   public void getLizzieBoardPosition() {
-		int moveCounter = 0;
-	    while(Lizzie.board.previousMove()) {
-	    	Lizzie.board.moveBranchUp();
-	    	moveCounter++;
-	    }
-	    for(int i = 0; i < moveCounter; i++) {
-	    	Optional<int[]> nextMove = Lizzie.board.getHistory().getNextMove();
-	    	if(nextMove.isPresent()) {
-		    	place(nextMove.get()[0], nextMove.get()[1], Lizzie.board.getHistory().next().get().lastMoveColor);
-		    	Lizzie.board.moveBranchDown();
-	    	}
-	    }
+    int moveCounter = 0;
+    while (Lizzie.board.previousMove()) {
+      Lizzie.board.moveBranchUp();
+      moveCounter++;
+    }
+    for (int i = 0; i < moveCounter; i++) {
+      Optional<int[]> nextMove = Lizzie.board.getHistory().getNextMove();
+      if (nextMove.isPresent()) {
+        place(
+            nextMove.get()[0],
+            nextMove.get()[1],
+            Lizzie.board.getHistory().next().get().lastMoveColor);
+        Lizzie.board.moveBranchDown();
+      }
+    }
   }
-  
+
   /**
    * Calculates the array index of a stone stored at (x, y)
    *
@@ -121,9 +121,9 @@ public class LABoard extends Board implements LeelazListener {
   }
 
   public void setHistory(BoardHistoryList newHistory) {
-	  history = newHistory;
+    history = newHistory;
   }
-  
+
   /**
    * Converts a named coordinate eg C16, T5, K10, etc to an x and y coordinate
    *
@@ -296,7 +296,8 @@ public class LABoard extends Board implements LeelazListener {
     if (Lizzie.frame.localAnalysisFrame.board.isValid(coord)) {
       int index = Lizzie.frame.localAnalysisFrame.board.getIndex(coord[0], coord[1]);
       if (Lizzie.frame.localAnalysisFrame.board.getHistory().getStones()[index] != Stone.EMPTY) {
-        BoardHistoryNode cur = Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode();
+        BoardHistoryNode cur =
+            Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode();
         moveNumber = cur.getData().moveNumberList[index];
         if (!cur.isMainTrunk()) {
           if (moveNumber > 0) {
@@ -464,15 +465,16 @@ public class LABoard extends Board implements LeelazListener {
       newState.dummy = dummy;
 
       // update leelaz with pass
-      if (!Lizzie.frame.localAnalysisFrame.leelaz.isInputCommand) Lizzie.frame.localAnalysisFrame.leelaz.playMove(color, "pass");
-      if (Lizzie.frame.localAnalysisFrame != null && Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz)
+      if (!Lizzie.frame.localAnalysisFrame.leelaz.isInputCommand)
+        Lizzie.frame.localAnalysisFrame.leelaz.playMove(color, "pass");
+      if (Lizzie.frame.localAnalysisFrame != null
+          && Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz)
         Lizzie.frame.localAnalysisFrame.leelaz.genmove((history.isBlacksTurn() ? "W" : "B"));
 
       // update history with pass
       history.addOrGoto(newState, newBranch, changeMove);
-      
-      if (Lizzie.frame.localAnalysisFrame != null)
-        Lizzie.frame.localAnalysisFrame.refresh();
+
+      if (Lizzie.frame.localAnalysisFrame != null) Lizzie.frame.localAnalysisFrame.refresh();
     }
   }
 
@@ -505,8 +507,7 @@ public class LABoard extends Board implements LeelazListener {
    * @param newBranch add a new branch
    */
   public void place(int x, int y, Stone color, boolean newBranch, boolean changeMove) {
-	if(Lizzie.frame.localAnalysisFrame != null)
-      Lizzie.frame.localAnalysisFrame.clearBeforeMove();
+    if (Lizzie.frame.localAnalysisFrame != null) Lizzie.frame.localAnalysisFrame.clearBeforeMove();
     synchronized (this) {
       if (scoreMode) {
         // Mark clicked stone as dead
@@ -538,7 +539,8 @@ public class LABoard extends Board implements LeelazListener {
         if (Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
             && Lizzie.frame.localAnalysisFrame.playerIsBlack != getData().blackToPlay) {
           Lizzie.frame.localAnalysisFrame.leelaz.playMove(color, convertCoordinatesToName(x, y));
-          Lizzie.frame.localAnalysisFrame.leelaz.genmove((Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? "W" : "B"));
+          Lizzie.frame.localAnalysisFrame.leelaz.genmove(
+              (Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? "W" : "B"));
         } else if (!Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz) {
           Lizzie.frame.localAnalysisFrame.leelaz.playMove(color, convertCoordinatesToName(x, y));
         }
@@ -606,20 +608,22 @@ public class LABoard extends Board implements LeelazListener {
 
       // update leelaz with board position
       Lizzie.frame.localAnalysisFrame.leelaz.beginModifyingBoard();
-      if (Lizzie.frame.localAnalysisFrame != null 
-    		&& Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
-    		&& Lizzie.frame.localAnalysisFrame.playerIsBlack == getData().blackToPlay) {
+      if (Lizzie.frame.localAnalysisFrame != null
+          && Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
+          && Lizzie.frame.localAnalysisFrame.playerIsBlack == getData().blackToPlay) {
         Lizzie.frame.localAnalysisFrame.leelaz.playMove(color, convertCoordinatesToName(x, y));
-        Lizzie.frame.localAnalysisFrame.leelaz.genmove((Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? "W" : "B"));
-      } else if (Lizzie.frame.localAnalysisFrame != null && !Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz && !Lizzie.frame.localAnalysisFrame.leelaz.isInputCommand) {
+        Lizzie.frame.localAnalysisFrame.leelaz.genmove(
+            (Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? "W" : "B"));
+      } else if (Lizzie.frame.localAnalysisFrame != null
+          && !Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
+          && !Lizzie.frame.localAnalysisFrame.leelaz.isInputCommand) {
         Lizzie.frame.localAnalysisFrame.leelaz.playMove(color, convertCoordinatesToName(x, y));
       }
 
       // update history with this coordinate
       history.addOrGoto(newState, newBranch, changeMove);
       Lizzie.frame.localAnalysisFrame.leelaz.endModifyingBoard();
-      if(Lizzie.frame.localAnalysisFrame != null)
-        Lizzie.frame.localAnalysisFrame.refresh();
+      if (Lizzie.frame.localAnalysisFrame != null) Lizzie.frame.localAnalysisFrame.refresh();
     }
   }
 
@@ -1431,7 +1435,8 @@ public class LABoard extends Board implements LeelazListener {
       }
       Lizzie.frame.localAnalysisFrame.leelaz.addListener(this);
       analysisMode = true;
-      if (!Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+      if (!Lizzie.frame.localAnalysisFrame.leelaz.isPondering())
+        Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
     }
   }
 
@@ -1626,7 +1631,8 @@ public class LABoard extends Board implements LeelazListener {
   }
 
   public boolean setAvoidCoords(int x, int y) {
-    Optional<int[]> boardCoordinates = Lizzie.frame.localAnalysisFrame.convertScreenToCoordinates(x, y);
+    Optional<int[]> boardCoordinates =
+        Lizzie.frame.localAnalysisFrame.convertScreenToCoordinates(x, y);
     if (boardCoordinates.isPresent()) {
       if (isCoordsEmpty(boardCoordinates.get()[0], boardCoordinates.get()[1])) {
         if (avoidCoords == "")
@@ -1644,7 +1650,8 @@ public class LABoard extends Board implements LeelazListener {
   }
 
   public boolean setAllowCoords(int x, int y) {
-    Optional<int[]> boardCoordinates = Lizzie.frame.localAnalysisFrame.convertScreenToCoordinates(x, y);
+    Optional<int[]> boardCoordinates =
+        Lizzie.frame.localAnalysisFrame.convertScreenToCoordinates(x, y);
     if (boardCoordinates.isPresent()) {
       if (isCoordsEmpty(boardCoordinates.get()[0], boardCoordinates.get()[1])) {
         allowCoords =
@@ -1656,7 +1663,8 @@ public class LABoard extends Board implements LeelazListener {
   }
 
   public boolean addAllowCoords(int x, int y) {
-    Optional<int[]> boardCoordinates = Lizzie.frame.localAnalysisFrame.convertScreenToCoordinates(x, y);
+    Optional<int[]> boardCoordinates =
+        Lizzie.frame.localAnalysisFrame.convertScreenToCoordinates(x, y);
     if (boardCoordinates.isPresent()) {
       if (isCoordsEmpty(boardCoordinates.get()[0], boardCoordinates.get()[1])) {
         allowCoords =

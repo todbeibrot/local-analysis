@@ -115,15 +115,15 @@ public class Config {
   private final String defaultGtpConsoleStyle =
       "body {background:#000000; color:#d0d0d0; font-family:Consolas, Menlo, Monaco, 'Ubuntu Mono', monospace; margin:4px;} .command {color:#ffffff;font-weight:bold;} .winrate {color:#ffffff;font-weight:bold;} .coord {color:#ffffff;font-weight:bold;}";
   public boolean notRefreshVariation = false;
-  
+
   public boolean allowKo = false;
   public boolean showLocalAnalysisStartDialog = false;
   public int maxAlivePoints = 4;
   public int wallDistance = 3;
   public int playerInside = 0;
-  //0: dialog, 1: automatic, 2: Black, 3: White
+  // 0: dialog, 1: automatic, 2: Black, 3: White
   public int playerToMove = 0;
-  //0: dialog, 1: same as before, 2: Black, 3: White, 4: inside player, 5: outside player
+  // 0: dialog, 1: same as before, 2: Black, 3: White, 4: inside player, 5: outside player
 
   private JSONObject loadAndMergeConfig(
       JSONObject defaultCfg, String fileName, boolean needValidation) throws IOException {
@@ -285,7 +285,7 @@ public class Config {
     nodeColorMode = theme.nodeColorMode();
 
     gtpConsoleStyle = uiConfig.optString("gtp-console-style", defaultGtpConsoleStyle);
-    
+
     allowKo = la.optBoolean("allow-Ko", false);
     showLocalAnalysisStartDialog = la.optBoolean("wall-distance", false);
     maxAlivePoints = la.optInt("max-alive-points", 4);
@@ -468,25 +468,25 @@ public class Config {
   }
 
   public void toggleAllowKo() {
-	  allowKo = !allowKo;
-	  la.put("allow-Ko", allowKo);
+    allowKo = !allowKo;
+    la.put("allow-Ko", allowKo);
   }
-  
+
   public void toggleStartPonderImmediately() {
-	  showLocalAnalysisStartDialog = !showLocalAnalysisStartDialog;
-	  la.put("start-ponder-immediately", showLocalAnalysisStartDialog);
+    showLocalAnalysisStartDialog = !showLocalAnalysisStartDialog;
+    la.put("start-ponder-immediately", showLocalAnalysisStartDialog);
   }
-  
+
   public void setPlayerInside(int a) {
-	  playerInside = a;
-	  la.put("player-inside", playerInside);
+    playerInside = a;
+    la.put("player-inside", playerInside);
   }
-  
+
   public void setPlayerToMove(int a) {
-	  playerToMove = a;
-	  la.put("player-to-move", playerToMove);	  
+    playerToMove = a;
+    la.put("player-to-move", playerToMove);
   }
-  
+
   /**
    * Scans the current directory as well as the current PATH to find a reasonable default leelaz
    * binary.
@@ -595,8 +595,8 @@ public class Config {
     ui.put("katago-estimate-mode", "small");
     ui.put("katago-estimate-blend", true);
     config.put("ui", ui);
-    
-    //About Local Analysis settings
+
+    // About Local Analysis settings
     JSONObject la = new JSONObject();
     la.put("max-alive-points", 4);
     la.put("wall-distance", 3);
@@ -605,7 +605,7 @@ public class Config {
     la.put("start-ponder-immediately", false);
     la.put("player-to-move", 0);
     config.put("la", la);
-    
+
     return config;
   }
 

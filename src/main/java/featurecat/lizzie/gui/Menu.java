@@ -1307,17 +1307,16 @@ public class Menu extends JMenuBar {
           @Override
           public void menuCanceled(MenuEvent e) {}
         });
-    
-    final JMenuItem localAnalysis = new JMenuItem("Local Analysis");
-	localAnalysis.addActionListener(
-			new ActionListener() {
-		          @Override
-		          public void actionPerformed(ActionEvent e) {
-		        	  Lizzie.frame.startLocalAnalysis();
-		          }
-		        });
-		    analyzeMenu.add(localAnalysis);
 
+    final JMenuItem localAnalysis = new JMenuItem("Local Analysis");
+    localAnalysis.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            Lizzie.frame.startLocalAnalysis();
+          }
+        });
+    analyzeMenu.add(localAnalysis);
 
     final JMenu configMenu = new JMenu(resourceBundle.getString("Menu.configMenu"));
     this.add(configMenu);
@@ -1364,17 +1363,16 @@ public class Menu extends JMenuBar {
           }
         });
     configMenu.add(about);
-    
-	final JMenuItem localSettings = new JMenuItem("Local Analysis");
-	localSettings.addActionListener(
-	    new ActionListener() {
-	      @Override
-	      public void actionPerformed(ActionEvent e) {
-	        Lizzie.frame.openConfigDialog(4);
-	      }
-	    });
-	configMenu.add(localSettings);
 
+    final JMenuItem localSettings = new JMenuItem("Local Analysis");
+    localSettings.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            Lizzie.frame.openConfigDialog(4);
+          }
+        });
+    configMenu.add(localSettings);
 
     engineMenu = new JMenu(resourceBundle.getString("Menu.engineMenu"));
     this.add(engineMenu);

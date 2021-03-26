@@ -1,9 +1,9 @@
 package la;
 
-import featurecat.lizzie.rules.*;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.analysis.MoveData;
+import featurecat.lizzie.rules.*;
 import featurecat.lizzie.util.Utils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -230,7 +230,8 @@ public class LABoardData {
       sb.append("move ").append(move.coordinate);
       sb.append(" visits ").append(move.playouts);
       sb.append(" winrate ").append((int) (move.winrate * 100));
-      if (Lizzie.frame.localAnalysisFrame.leelaz.supportScoremean()) sb.append(" scoreMean ").append(move.scoreMean);
+      if (Lizzie.frame.localAnalysisFrame.leelaz.supportScoremean())
+        sb.append(" scoreMean ").append(move.scoreMean);
       sb.append(" pv ").append(move.variation.stream().reduce((a, b) -> a + " " + b).get());
       sb.append(" info "); // this order is just because of how the MoveData info parser works
     }

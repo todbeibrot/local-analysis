@@ -11,11 +11,11 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 
-import featurecat.lizzie.gui.*;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.Branch;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.analysis.MoveData;
+import featurecat.lizzie.gui.*;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.BoardHistoryNode;
@@ -142,7 +142,9 @@ public class LABoardRenderer {
     //        timer.lap("background");
     drawStones();
     //        timer.lap("stones");
-    if (Lizzie.frame.localAnalysisFrame.board != null && Lizzie.frame.localAnalysisFrame.board.inScoreMode() && isMainBoard) {
+    if (Lizzie.frame.localAnalysisFrame.board != null
+        && Lizzie.frame.localAnalysisFrame.board.inScoreMode()
+        && isMainBoard) {
       drawScore(g);
     } else {
       drawBranch();
@@ -164,7 +166,8 @@ public class LABoardRenderer {
       //        timer.lap("movenumbers");
       List<TextData> textDatas = new ArrayList<>();
       if (Lizzie.frame.localAnalysisFrame.isShowingPolicy) drawPolicy(g);
-      else if (!Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz && Lizzie.config.showBestMovesNow()) {
+      else if (!Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz
+          && Lizzie.config.showBestMovesNow()) {
         drawLeelazSuggestionsBackgroundShadow(g, textDatas);
         drawLeelazSuggestionsBackgroundCircle(g, textDatas);
       }
@@ -306,8 +309,20 @@ public class LABoardRenderer {
               stoneRadius);
           if (!Lizzie.config.showNameInBoard
               || Lizzie.frame.localAnalysisFrame.board != null
-                  && (Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getPlayerWhite().equals("")
-                      && Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getPlayerBlack().equals(""))) {
+                  && (Lizzie.frame
+                          .localAnalysisFrame
+                          .board
+                          .getHistory()
+                          .getGameInfo()
+                          .getPlayerWhite()
+                          .equals("")
+                      && Lizzie.frame
+                          .localAnalysisFrame
+                          .board
+                          .getHistory()
+                          .getGameInfo()
+                          .getPlayerBlack()
+                          .equals(""))) {
             drawString(
                 g,
                 x + scaledMarginWidth + squareWidth * i,
@@ -387,9 +402,11 @@ public class LABoardRenderer {
       return;
     }
     g0.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    String black = Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getPlayerBlack();
+    String black =
+        Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getPlayerBlack();
     if (black.length() > 20) black = black.substring(0, 20);
-    String white = Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getPlayerWhite();
+    String white =
+        Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getPlayerWhite();
     if (white.length() > 20) white = white.substring(0, 20);
     if (black.equals("") && white.contentEquals("")) {
       if (!emptyName) {
@@ -527,7 +544,13 @@ public class LABoardRenderer {
           int stoneX = scaledMarginWidth + squareWidth * i;
           int stoneY = scaledMarginHeight + squareHeight * j;
           drawStone(
-              g, gShadow, stoneX, stoneY, Lizzie.frame.localAnalysisFrame.board.getStones()[Board.getIndex(i, j)], i, j);
+              g,
+              gShadow,
+              stoneX,
+              stoneY,
+              Lizzie.frame.localAnalysisFrame.board.getStones()[Board.getIndex(i, j)],
+              i,
+              j);
         }
       }
 
@@ -593,8 +616,10 @@ public class LABoardRenderer {
     bestMoves = Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves();
     if (Lizzie.config.showBestMovesByHold
         && Leelaz.engineIndex == Lizzie.frame.localAnalysisFrame.board.getData().engineIndex
-        && Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getKomi() == Lizzie.frame.localAnalysisFrame.board.getData().komi
-        && MoveData.getPlayouts(bestMoves) < Lizzie.frame.localAnalysisFrame.board.getData().getPlayouts()) {
+        && Lizzie.frame.localAnalysisFrame.board.getHistory().getGameInfo().getKomi()
+            == Lizzie.frame.localAnalysisFrame.board.getData().komi
+        && MoveData.getPlayouts(bestMoves)
+            < Lizzie.frame.localAnalysisFrame.board.getData().getPlayouts()) {
       bestMoves = Lizzie.frame.localAnalysisFrame.board.getData().bestMoves;
     }
 
@@ -628,7 +653,8 @@ public class LABoardRenderer {
         variation = suggestedMove.get().variation;
       }
     }
-    Branch branch = new Branch(Lizzie.frame.localAnalysisFrame.board, variation, displayedBranchLength);
+    Branch branch =
+        new Branch(Lizzie.frame.localAnalysisFrame.board, variation, displayedBranchLength);
     if (isMainBoard) mouseOverCoords = suggestedMove.get().coordinate;
     branchOpt = Optional.of(branch);
     variationOpt = Optional.of(variation);
@@ -642,7 +668,8 @@ public class LABoardRenderer {
         int index = Board.getIndex(i, j);
         Stone stone = branch.data.stones[index];
         boolean isGhost = (stone == Stone.BLACK_GHOST || stone == Stone.WHITE_GHOST);
-        if (Lizzie.frame.localAnalysisFrame.board.getData().stones[index] != Stone.EMPTY && !isGhost) continue;
+        if (Lizzie.frame.localAnalysisFrame.board.getData().stones[index] != Stone.EMPTY
+            && !isGhost) continue;
         if (branch.data.moveNumberList[index] > maxBranchMoves()) continue;
 
         int stoneX = scaledMarginWidth + squareWidth * i;
@@ -820,7 +847,8 @@ public class LABoardRenderer {
         boolean isBestMove = bestMoves.get(0) == move;
         boolean hasMaxWinrate = move.winrate == maxWinrate;
         boolean flipWinrate =
-            uiConfig.getBoolean("win-rate-always-black") && !Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay;
+            uiConfig.getBoolean("win-rate-always-black")
+                && !Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay;
 
         if (move.playouts == 0) {
           continue; // This actually can happen
@@ -954,16 +982,21 @@ public class LABoardRenderer {
           roundedWinrate = 100.0 - roundedWinrate;
         }
         g.setColor(Color.BLACK);
-        if (branchOpt.isPresent() && Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay) g.setColor(Color.WHITE);
+        if (branchOpt.isPresent() && Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay)
+          g.setColor(Color.WHITE);
 
         String text;
         if (Lizzie.config.handicapInsteadOfWinrate) {
-          text = String.format("%.2f", Lizzie.frame.localAnalysisFrame.leelaz.winrateToHandicap(textData.move.winrate));
+          text =
+              String.format(
+                  "%.2f",
+                  Lizzie.frame.localAnalysisFrame.leelaz.winrateToHandicap(textData.move.winrate));
         } else {
           text = String.format("%.1f", roundedWinrate);
         }
 
-        if (Lizzie.frame.localAnalysisFrame.leelaz.supportScoremean() && Lizzie.config.showScoremeanInSuggestion) {
+        if (Lizzie.frame.localAnalysisFrame.leelaz.supportScoremean()
+            && Lizzie.config.showScoremeanInSuggestion) {
           double score = Utils.actualScoreMean(textData.move.scoreMean);
           if (!Lizzie.config.showWinrateInSuggestion) {
             drawString(
@@ -1074,7 +1107,8 @@ public class LABoardRenderer {
 
   private void drawNextMoves(Graphics2D g) {
     if (Lizzie.frame.localAnalysisFrame.board == null) return;
-    g.setColor(Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? Color.BLACK : Color.WHITE);
+    g.setColor(
+        Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? Color.BLACK : Color.WHITE);
 
     List<BoardHistoryNode> nexts = Lizzie.frame.localAnalysisFrame.board.getHistory().getNexts();
 
@@ -1431,12 +1465,15 @@ public class LABoardRenderer {
                   int[] move = SGFParser.convertSgfPosToCoord(moves[0]);
                   if (move != null) {
                     Optional<int[]> lastMove =
-                        branchOpt.map(b -> b.data.lastMove).orElse(Lizzie.frame.localAnalysisFrame.board.getLastMove());
+                        branchOpt
+                            .map(b -> b.data.lastMove)
+                            .orElse(Lizzie.frame.localAnalysisFrame.board.getLastMove());
                     if (lastMove.map(m -> !Arrays.equals(move, m)).orElse(true)) {
                       int moveX = x + scaledMarginWidth + squareWidth * move[0];
                       int moveY = y + scaledMarginHeight + squareHeight * move[1];
                       g.setColor(
-                          Lizzie.frame.localAnalysisFrame.board.getStones()[Board.getIndex(move[0], move[1])].isBlack()
+                          Lizzie.frame.localAnalysisFrame.board
+                                  .getStones()[Board.getIndex(move[0], move[1])].isBlack()
                               ? Color.WHITE
                               : Color.BLACK);
                       g.setStroke(new BasicStroke(2));
@@ -1726,9 +1763,16 @@ public class LABoardRenderer {
         .ifPresent(
             m -> {
               if (m.variation.size() > 0) {
-                if (Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode().numberOfChildren() == 0) {
+                if (Lizzie.frame
+                        .localAnalysisFrame
+                        .board
+                        .getHistory()
+                        .getCurrentHistoryNode()
+                        .numberOfChildren()
+                    == 0) {
                   Stone color =
-                      Lizzie.frame.localAnalysisFrame.board.getHistory().getLastMoveColor() == Stone.WHITE
+                      Lizzie.frame.localAnalysisFrame.board.getHistory().getLastMoveColor()
+                              == Stone.WHITE
                           ? Stone.BLACK
                           : Stone.WHITE;
                   Lizzie.frame.localAnalysisFrame.board.getHistory().pass(color, false, true);
@@ -1736,7 +1780,8 @@ public class LABoardRenderer {
                 }
                 for (int i = 0; i < m.variation.size(); i++) {
                   Stone color =
-                      Lizzie.frame.localAnalysisFrame.board.getHistory().getLastMoveColor() == Stone.WHITE
+                      Lizzie.frame.localAnalysisFrame.board.getHistory().getLastMoveColor()
+                              == Stone.WHITE
                           ? Stone.BLACK
                           : Stone.WHITE;
                   Optional<int[]> coordOpt = Board.asCoordinates(m.variation.get(i));
@@ -1745,7 +1790,11 @@ public class LABoardRenderer {
                     break;
                   }
                   int[] coord = coordOpt.get();
-                  Lizzie.frame.localAnalysisFrame.board.getHistory().place(coord[0], coord[1], color, i == 0);
+                  Lizzie.frame
+                      .localAnalysisFrame
+                      .board
+                      .getHistory()
+                      .place(coord[0], coord[1], color, i == 0);
                 }
                 Lizzie.frame.localAnalysisFrame.board.getHistory().toBranchTop();
                 Lizzie.frame.localAnalysisFrame.refresh(2);
@@ -1848,7 +1897,8 @@ public class LABoardRenderer {
         estimate = Math.signum(estimate);
       } else {
         // KataGo's estimates are for player to move, not for black.
-        if (!Lizzie.frame.localAnalysisFrame.board.getHistory().isBlacksTurn()) estimate = -estimate;
+        if (!Lizzie.frame.localAnalysisFrame.board.getHistory().isBlacksTurn())
+          estimate = -estimate;
       }
       int[] c = Lizzie.frame.localAnalysisFrame.board.getCoord(i);
       int x = c[1];
@@ -1926,7 +1976,8 @@ public class LABoardRenderer {
     float greenHue = Color.RGBtoHSB(0, 255, 0, null)[0];
     float cyanHue = Color.RGBtoHSB(0, 255, 255, null)[0];
 
-    if (Lizzie.frame.localAnalysisFrame.isShowingPolicy && !Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves().isEmpty()) {
+    if (Lizzie.frame.localAnalysisFrame.isShowingPolicy
+        && !Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves().isEmpty()) {
       Double maxPolicy = 0.0;
       for (int n = 0; n < Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves().size(); n++) {
         if (Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves().get(n).policy > maxPolicy)
@@ -1974,7 +2025,9 @@ public class LABoardRenderer {
             fillCircle(g, suggestionX, suggestionY, stoneRadius);
 
             String text =
-                String.format("%.1f", ((double) Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves().get(i).policy));
+                String.format(
+                    "%.1f",
+                    ((double) Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves().get(i).policy));
             g.setColor(Color.WHITE);
             drawString(
                 g,

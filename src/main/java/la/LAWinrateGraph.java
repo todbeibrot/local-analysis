@@ -1,7 +1,6 @@
 package la;
 
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.rules.BoardHistoryNode;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -22,7 +21,8 @@ public class LAWinrateGraph {
   double maxcoreMean = 30.0;
 
   public void draw(Graphics2D g, int posx, int posy, int width, int height) {
-    BoardHistoryNode curMove = Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode();
+    BoardHistoryNode curMove =
+        Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode();
     BoardHistoryNode node = curMove;
 
     // draw background rectangle

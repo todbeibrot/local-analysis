@@ -11,8 +11,6 @@ import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.analysis.YaZenGtp;
 import featurecat.lizzie.util.Utils;
 import featurecat.lizzie.util.WindowPosition;
-import la.LocalAnalysisDialog;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -710,7 +708,7 @@ public class LizzieMain extends MainFrame {
       } else boardPane.drawEstimateRect(estimateArray, true);
     }
   }
-  
+
   @Override
   public void saveImage() {
     boardPane.saveImage();

@@ -11,7 +11,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWheelListener, MouseMotionListener {
+public class LocalAnalysisInput
+    implements MouseListener, KeyListener, MouseWheelListener, MouseMotionListener {
   @Override
   public void mouseClicked(MouseEvent e) {}
 
@@ -46,8 +47,8 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
 
   @Override
   public void mouseMoved(MouseEvent e) {
-    if (!Lizzie.frame.localAnalysisFrame.isShowingRightMenu) 
-    	Lizzie.frame.localAnalysisFrame.onMouseMoved(e.getX(), e.getY());
+    if (!Lizzie.frame.localAnalysisFrame.isShowingRightMenu)
+      Lizzie.frame.localAnalysisFrame.onMouseMoved(e.getX(), e.getY());
   }
 
   @Override
@@ -58,7 +59,8 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
   }
 
   public static void undo(int movesToAdvance) {
-    if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode()) Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
+    if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode())
+      Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
     if (Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz) {
       Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz = false;
     }
@@ -76,7 +78,8 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
     // Use cases:
     // [Delete branch] Call this function and then deleteMove.
     // [Go to junction] Call this function twice.
-    if (!Lizzie.frame.localAnalysisFrame.board.undoToChildOfPreviousWithVariation()) Lizzie.frame.localAnalysisFrame.board.previousMove();
+    if (!Lizzie.frame.localAnalysisFrame.board.undoToChildOfPreviousWithVariation())
+      Lizzie.frame.localAnalysisFrame.board.previousMove();
   }
 
   private void undoToFirstParentWithVariations() {
@@ -87,9 +90,21 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
 
   private void goCommentNode(boolean moveForward) {
     if (moveForward) {
-      redo(Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode().goToNextNodeWithComment());
+      redo(
+          Lizzie.frame
+              .localAnalysisFrame
+              .board
+              .getHistory()
+              .getCurrentHistoryNode()
+              .goToNextNodeWithComment());
     } else {
-      undo(Lizzie.frame.localAnalysisFrame.board.getHistory().getCurrentHistoryNode().goToPreviousNodeWithComment());
+      undo(
+          Lizzie.frame
+              .localAnalysisFrame
+              .board
+              .getHistory()
+              .getCurrentHistoryNode()
+              .goToPreviousNodeWithComment());
     }
   }
 
@@ -98,7 +113,8 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
   }
 
   public static void redo(int movesToAdvance) {
-    if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode()) Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
+    if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode())
+      Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
     if (Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz) {
       Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz = false;
     }
@@ -246,11 +262,12 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
         }
         break;
 
-//      case VK_N:
-//        // stop the ponder
-//        if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
-//        Lizzie.frame.localAnalysisFrame.startGame();
-//        break;
+        //      case VK_N:
+        //        // stop the ponder
+        //        if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering())
+        // Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+        //        Lizzie.frame.localAnalysisFrame.startGame();
+        //        break;
       case VK_SPACE:
         if (Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz) {
           Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz = false;
@@ -265,7 +282,8 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
         break;
 
       case VK_COMMA:
-        if (!Lizzie.frame.localAnalysisFrame.playCurrentVariation()) Lizzie.frame.localAnalysisFrame.playBestMove();
+        if (!Lizzie.frame.localAnalysisFrame.playCurrentVariation())
+          Lizzie.frame.localAnalysisFrame.playBestMove();
         break;
 
       case VK_M:
@@ -276,9 +294,9 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
         }
         break;
 
-//      case VK_Q:
-//        Lizzie.frame.localAnalysisFrame.openOnlineDialog();
-//        break;
+        //      case VK_Q:
+        //        Lizzie.frame.localAnalysisFrame.openOnlineDialog();
+        //        break;
 
       case VK_F:
         Lizzie.config.toggleShowNextMoves();
@@ -296,28 +314,30 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
         }
         break;
 
-//      case VK_I:
-//        // stop the ponder
-//        boolean isPondering = Lizzie.frame.localAnalysisFrame.leelaz.isPondering();
-//        if (isPondering) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
-//        Lizzie.frame.localAnalysisFrame.editGameInfo();
-//        if (isPondering) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
-//        break;
+        //      case VK_I:
+        //        // stop the ponder
+        //        boolean isPondering = Lizzie.frame.localAnalysisFrame.leelaz.isPondering();
+        //        if (isPondering) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+        //        Lizzie.frame.localAnalysisFrame.editGameInfo();
+        //        if (isPondering) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+        //        break;
 
       case VK_S:
         if (e.isAltDown()) {
           Lizzie.frame.localAnalysisFrame.saveImage();
         } else {
           // stop the ponder
-          if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+          if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering())
+            Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
           Lizzie.frame.localAnalysisFrame.saveFile();
         }
         break;
 
-//      case VK_O:
-//        if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
-//        Lizzie.frame.localAnalysisFrame.openFile();
-//        break;
+        //      case VK_O:
+        //        if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering())
+        // Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+        //        Lizzie.frame.localAnalysisFrame.openFile();
+        //        break;
 
       case VK_V:
         if (controlIsPressed(e)) {
@@ -327,33 +347,33 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
         }
         break;
 
-//      case VK_HOME:
-//        if (controlIsPressed(e)) {
-//          Lizzie.frame.localAnalysisFrame.board.clear();
-//        } else {
-//          while (Lizzie.frame.localAnalysisFrame.board.previousMove()) ;
-//        }
-//        break;
+        //      case VK_HOME:
+        //        if (controlIsPressed(e)) {
+        //          Lizzie.frame.localAnalysisFrame.board.clear();
+        //        } else {
+        //          while (Lizzie.frame.localAnalysisFrame.board.previousMove()) ;
+        //        }
+        //        break;
 
       case VK_END:
         while (Lizzie.frame.localAnalysisFrame.board.nextMove()) ;
         break;
 
       case VK_X:
-//        if (controlIsPressed(e)) {
-//          Lizzie.frame.localAnalysisFrame.openConfigDialog();
-//        } else {
-          if (!Lizzie.frame.localAnalysisFrame.showControls) {
-            if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) {
-              wasPonderingWhenControlsShown = true;
-              Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
-            } else {
-              wasPonderingWhenControlsShown = false;
-            }
-            Lizzie.frame.localAnalysisFrame.drawControls();
+        //        if (controlIsPressed(e)) {
+        //          Lizzie.frame.localAnalysisFrame.openConfigDialog();
+        //        } else {
+        if (!Lizzie.frame.localAnalysisFrame.showControls) {
+          if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) {
+            wasPonderingWhenControlsShown = true;
+            Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+          } else {
+            wasPonderingWhenControlsShown = false;
           }
-          Lizzie.frame.localAnalysisFrame.showControls = true;
-//        }
+          Lizzie.frame.localAnalysisFrame.drawControls();
+        }
+        Lizzie.frame.localAnalysisFrame.showControls = true;
+        //        }
         break;
 
       case VK_W:
@@ -408,22 +428,24 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
                       .getJSONObject("leelaz")
                       .getInt("max-game-thinking-time-seconds")
                   + " 1");
-          Lizzie.frame.localAnalysisFrame.playerIsBlack = !Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay;
+          Lizzie.frame.localAnalysisFrame.playerIsBlack =
+              !Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay;
           Lizzie.frame.localAnalysisFrame.isPlayingAgainstLeelaz = true;
-          Lizzie.frame.localAnalysisFrame.leelaz.genmove((Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? "B" : "W"));
+          Lizzie.frame.localAnalysisFrame.leelaz.genmove(
+              (Lizzie.frame.localAnalysisFrame.board.getData().blackToPlay ? "B" : "W"));
         }
         break;
-      
+
       case VK_ESCAPE:
         Lizzie.frame.localAnalysisFrame.close();
         break;
-      
+
       case VK_SHIFT:
       case VK_CAPS_LOCK:
-    	if(Lizzie.frame.localAnalysisFrame.localAnalysis != null) {
-    		Lizzie.frame.localAnalysisFrame.localAnalysis.changePlaceBlackStones();
-    	}
-    	break;
+        if (Lizzie.frame.localAnalysisFrame.localAnalysis != null) {
+          Lizzie.frame.localAnalysisFrame.localAnalysis.changePlaceBlackStones();
+        }
+        break;
 
       case VK_DELETE:
       case VK_BACK_SPACE:
@@ -507,11 +529,11 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
       case VK_R:
         Lizzie.frame.localAnalysisFrame.replayBranch(e.isAltDown());
         break;
-      
-//      case VK_J:
-//    	  Lizzie.frame.localAnalysisFrame.startLocalAnalysis();
-//    	  break;
-    	  
+
+        //      case VK_J:
+        //    	  Lizzie.frame.localAnalysisFrame.startLocalAnalysis();
+        //    	  break;
+
       case VK_OPEN_BRACKET:
         if (Lizzie.frame.localAnalysisFrame.boardPositionProportion > 0) {
           Lizzie.frame.localAnalysisFrame.boardPositionProportion--;
@@ -550,7 +572,10 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
         shouldDisableAnalysis = false;
     }
 
-    if (shouldDisableAnalysis && Lizzie.frame.localAnalysisFrame != null && Lizzie.frame.localAnalysisFrame.board.inAnalysisMode()) Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
+    if (shouldDisableAnalysis
+        && Lizzie.frame.localAnalysisFrame != null
+        && Lizzie.frame.localAnalysisFrame.board.inAnalysisMode())
+      Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
 
     Lizzie.frame.localAnalysisFrame.refresh(refreshType);
   }
@@ -560,11 +585,11 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
   @Override
   public void keyReleased(KeyEvent e) {
     switch (e.getKeyCode()) {
-//      case VK_SHIFT:
-//  	    if(Lizzie.frame.localAnalysisFrame.localAnalysis != null) {
-//  		  Lizzie.frame.localAnalysisFrame.localAnalysis.changePlaceBlackStones();
-//  	    }
-//  	    break;
+        //      case VK_SHIFT:
+        //  	    if(Lizzie.frame.localAnalysisFrame.localAnalysis != null) {
+        //  		  Lizzie.frame.localAnalysisFrame.localAnalysis.changePlaceBlackStones();
+        //  	    }
+        //  	    break;
       case VK_X:
         if (wasPonderingWhenControlsShown) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
         Lizzie.frame.localAnalysisFrame.showControls = false;
@@ -592,7 +617,8 @@ public class LocalAnalysisInput implements MouseListener, KeyListener, MouseWhee
     }
     if (e.getWhen() - wheelWhen > 0) {
       wheelWhen = e.getWhen();
-      if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode()) Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
+      if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode())
+        Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
       if (e.getWheelRotation() > 0) {
         if (Lizzie.frame.localAnalysisFrame.isMouseOver) {
           Lizzie.frame.localAnalysisFrame.doBranch(1);

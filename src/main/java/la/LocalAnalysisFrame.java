@@ -6,17 +6,15 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import com.jhlabs.image.GaussianFilter;
-import featurecat.lizzie.gui.*;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.Leelaz;
-import featurecat.lizzie.analysis.LeelazListener;
 import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.analysis.YaZenGtp;
+import featurecat.lizzie.gui.*;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.SGFParser;
-import featurecat.lizzie.util.DigitOnlyFilter;
 import featurecat.lizzie.util.Utils;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -24,8 +22,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
@@ -33,7 +29,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
@@ -42,14 +37,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.swing.*;
-import javax.swing.text.DocumentFilter;
-import javax.swing.text.InternationalFormatter;
-
 import org.json.JSONArray;
 
 /** The window used to display the game. */
 public class LocalAnalysisFrame extends MainFrame {
-	
+
   private static final String[] commands = {
     resourceBundle.getString("LizzieFrame.commands.keyN"),
     resourceBundle.getString("LizzieFrame.commands.keyEnter"),
@@ -105,46 +97,45 @@ public class LocalAnalysisFrame extends MainFrame {
   private boolean isReplayVariation = false;
 
   // Display Comment
-//  private HTMLDocument htmlDoc;
-//  private LizziePane.HtmlKit htmlKit;
-//  private StyleSheet htmlStyle;
-//  private JScrollPane scrollPane;
-//  private JTextPane commentPane;
-//  private BufferedImage cachedCommentImage = new BufferedImage(1, 1, TYPE_INT_ARGB);
-//  private String cachedComment;
-  
+  //  private HTMLDocument htmlDoc;
+  //  private LizziePane.HtmlKit htmlKit;
+  //  private StyleSheet htmlStyle;
+  //  private JScrollPane scrollPane;
+  //  private JTextPane commentPane;
+  //  private BufferedImage cachedCommentImage = new BufferedImage(1, 1, TYPE_INT_ARGB);
+  //  private String cachedComment;
+
   // Display Tools
   public LATools tools;
   private BufferedImage cachedToolsImage = new BufferedImage(1, 1, TYPE_INT_ARGB);
   private Rectangle toolsRect;
-  
-  public int tool1;		//0 = choose coordinates for LA, 1 = play, 2 = setStones, 3 = deleteStones, 
-  						//4 = setGroupesVertical, 5 = setGroupesHorizontal, 6 = setLine
+
+  public int tool1; // 0 = choose coordinates for LA, 1 = play, 2 = setStones, 3 = deleteStones,
+  // 4 = setGroupesVertical, 5 = setGroupesHorizontal, 6 = setLine
 
   // Show the playouts in the title
   private ScheduledExecutorService showPlayouts = Executors.newScheduledThreadPool(1);
   private long lastPlayouts = 0;
   public boolean isDrawVisitsInTitle = true;
   RightClickMenu rightClickMenu;
-  
+
   public LocalAnalysis localAnalysis;
   public int[] coordinate1;
   public int[] coordinate2;
   public LALeelaz leelaz;
   public static LAGtpConsolePane gtpConsole;
 
-
   /** Creates a window */
   public LocalAnalysisFrame() {
     super();
-    
+
     if (Lizzie.frame.isPlayingAgainstLeelaz) {
-        Lizzie.frame.isPlayingAgainstLeelaz = false;
-        Lizzie.leelaz.isThinking = false;
-      }
+      Lizzie.frame.isPlayingAgainstLeelaz = false;
+      Lizzie.leelaz.isThinking = false;
+    }
     Lizzie.leelaz.togglePonder();
     Lizzie.frame.refresh(2);
-    
+
     boardRenderer = new LABoardRenderer(true);
     subBoardRenderer = new LABoardRenderer(false);
     variationTree = new LAVariationTree();
@@ -155,7 +146,7 @@ public class LocalAnalysisFrame extends MainFrame {
     setForceRefresh(false);
 
     Lizzie.frame.isPlayingAgainstLeelaz = false;
-    
+
     menu = new LAMenu();
     menu.setVisible(false);
     toolBar = new LAToolBar();
@@ -203,63 +194,62 @@ public class LocalAnalysisFrame extends MainFrame {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-//    htmlKit = new LizziePane.HtmlKit();
-//    htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
-//    htmlStyle = htmlKit.getStyleSheet();
-//    String style =
-//        "body {background:#"
-//            + String.format(
-//                "%02x%02x%02x",
-//                Lizzie.config.commentBackgroundColor.getRed(),
-//                Lizzie.config.commentBackgroundColor.getGreen(),
-//                Lizzie.config.commentBackgroundColor.getBlue())
-//            + "; color:#"
-//            + String.format(
-//                "%02x%02x%02x",
-//                Lizzie.config.commentFontColor.getRed(),
-//                Lizzie.config.commentFontColor.getGreen(),
-//                Lizzie.config.commentFontColor.getBlue())
-//            + "; font-family:"
-//            + Lizzie.config.fontName
-//            + ", Consolas, Menlo, Monaco, 'Ubuntu Mono', monospace;"
-//            + (Lizzie.config.commentFontSize > 0
-//                ? "font-size:" + Lizzie.config.commentFontSize
-//                : "")
-//            + "}";
-//    htmlStyle.addRule(style);
-//    commentPane = new JTextPane();
-//    commentPane.setBorder(BorderFactory.createEmptyBorder());
-//    commentPane.setEditorKit(htmlKit);
-//    commentPane.setDocument(htmlDoc);
-//    commentPane.setEditable(false);
-//    scrollPane = new JScrollPane();
-//    scrollPane.setViewportView(commentPane);
-//    scrollPane.setBorder(null);
-//    scrollPane.setVerticalScrollBarPolicy(
-//        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-//    commentRect = new Rectangle(0, 0, 0, 0);
-//
-//    try {
-//      this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-    
-    //Tools
+    //    htmlKit = new LizziePane.HtmlKit();
+    //    htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
+    //    htmlStyle = htmlKit.getStyleSheet();
+    //    String style =
+    //        "body {background:#"
+    //            + String.format(
+    //                "%02x%02x%02x",
+    //                Lizzie.config.commentBackgroundColor.getRed(),
+    //                Lizzie.config.commentBackgroundColor.getGreen(),
+    //                Lizzie.config.commentBackgroundColor.getBlue())
+    //            + "; color:#"
+    //            + String.format(
+    //                "%02x%02x%02x",
+    //                Lizzie.config.commentFontColor.getRed(),
+    //                Lizzie.config.commentFontColor.getGreen(),
+    //                Lizzie.config.commentFontColor.getBlue())
+    //            + "; font-family:"
+    //            + Lizzie.config.fontName
+    //            + ", Consolas, Menlo, Monaco, 'Ubuntu Mono', monospace;"
+    //            + (Lizzie.config.commentFontSize > 0
+    //                ? "font-size:" + Lizzie.config.commentFontSize
+    //                : "")
+    //            + "}";
+    //    htmlStyle.addRule(style);
+    //    commentPane = new JTextPane();
+    //    commentPane.setBorder(BorderFactory.createEmptyBorder());
+    //    commentPane.setEditorKit(htmlKit);
+    //    commentPane.setDocument(htmlDoc);
+    //    commentPane.setEditable(false);
+    //    scrollPane = new JScrollPane();
+    //    scrollPane.setViewportView(commentPane);
+    //    scrollPane.setBorder(null);
+    //    scrollPane.setVerticalScrollBarPolicy(
+    //        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    //    commentRect = new Rectangle(0, 0, 0, 0);
+    //
+    //    try {
+    //      this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+    //    } catch (IOException e) {
+    //      e.printStackTrace();
+    //    }
+
+    // Tools
     tools = new LATools();
     toolsRect = new Rectangle(0, 0, 0, 0);
     setVisible(true);
- 
 
     createBufferStrategy(2);
     bs = getBufferStrategy();
 
     LocalAnalysisInput input = new LocalAnalysisInput();
-	 
-	mainPanel.addMouseListener(input);
-	mainPanel.addKeyListener(input);
-	mainPanel.addMouseWheelListener(input);
-	mainPanel.addMouseMotionListener(input);
+
+    mainPanel.addMouseListener(input);
+    mainPanel.addKeyListener(input);
+    mainPanel.addMouseWheelListener(input);
+    mainPanel.addMouseMotionListener(input);
 
     // necessary for Windows users - otherwise Lizzie shows a blank white screen on startup until
     // updates occur.
@@ -284,7 +274,8 @@ public class LocalAnalysisFrame extends MainFrame {
             }
             if (Lizzie.frame.localAnalysisFrame.leelaz == null) return;
             try {
-              int totalPlayouts = MoveData.getPlayouts(Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves());
+              int totalPlayouts =
+                  MoveData.getPlayouts(Lizzie.frame.localAnalysisFrame.leelaz.getBestMoves());
               if (totalPlayouts <= 0) return;
               visitsString =
                   String.format(
@@ -301,119 +292,118 @@ public class LocalAnalysisFrame extends MainFrame {
         1,
         TimeUnit.SECONDS);
   }
-  
+
   public void start() {
-	    gtpConsole = new LAGtpConsolePane(this);
-	    gtpConsole.setVisible(false);
-	    
-	    Lizzie.leelaz.removeListener(Lizzie.board);
-	    //Lizzie.leelaz.clear();
-	    
-	    leelaz = new LALeelaz(Lizzie.leelaz.engineCommand());
-	    leelaz.board = board;
-	    leelaz.addListener(board);
-	    try{leelaz.startEngine();}
-	    catch(Exception e){
-	    	System.exit(0);
-	    }
-	    leelaz.preload = true;
-	    if (isPlayingAgainstLeelaz) {
-	          isPlayingAgainstLeelaz = false;
-	          leelaz.isThinking = false;
-	        }
-	    board.getLizzieBoardPosition();
-	    Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
-	    refresh(2);
-	    Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
+    gtpConsole = new LAGtpConsolePane(this);
+    gtpConsole.setVisible(false);
+
+    Lizzie.leelaz.removeListener(Lizzie.board);
+    // Lizzie.leelaz.clear();
+
+    leelaz = new LALeelaz(Lizzie.leelaz.engineCommand());
+    leelaz.board = board;
+    leelaz.addListener(board);
+    try {
+      leelaz.startEngine();
+    } catch (Exception e) {
+      System.exit(0);
+    }
+    leelaz.preload = true;
+    if (isPlayingAgainstLeelaz) {
+      isPlayingAgainstLeelaz = false;
+      leelaz.isThinking = false;
+    }
+    board.getLizzieBoardPosition();
+    Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
+    refresh(2);
+    Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
   }
-  
+
   public void close() {
-	  this.setVisible(false);
-	  Lizzie.frame.localAnalysisFrame.leelaz.removeListener(board);
-	  Lizzie.frame.localAnalysisFrame.leelaz.clear();
-	  Lizzie.leelaz.addListener(Lizzie.board);
-	  Lizzie.frame.localAnalysisFrame = null;
+    this.setVisible(false);
+    Lizzie.frame.localAnalysisFrame.leelaz.removeListener(board);
+    Lizzie.frame.localAnalysisFrame.leelaz.clear();
+    Lizzie.leelaz.addListener(Lizzie.board);
+    Lizzie.frame.localAnalysisFrame = null;
   }
 
   public void adjustPoints() {
-	  double curScoreMean = 0;
-	  int lastChange = 400;
-	  int playouts = 0;
-	  int lastPlayouts = 0;
-	  int change = 0;
-	  
-	  BoardHistoryNode node = board.getHistory().getCurrentHistoryNode();
-	  if(!node.getData().bestMoves.isEmpty())
-		  curScoreMean = node.getData().bestMoves.get(0).scoreMean;
-	  else {
-		  return;
-	  }
-	  
-	  while(true) {
-		  playouts = node.getData().getPlayouts();
-		  if(playouts == 0) {
-			  try {
-					Thread.sleep(200);
-				  } catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-				  }
-			  if(playouts == 0) {
-				  return;
-			  }
-		  }
-		  if(lastPlayouts == playouts) {
-			  try {
-					Thread.sleep(200);
-				  } catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-				  }
-			  if(lastPlayouts == playouts) {
-				  return;
-			  }
-			  
-		  }
-		  if(playouts < 50) {
-			  try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			continue;
-		  }
-		  if(curScoreMean < 1 && curScoreMean > 1) {
-			  return;
-		  }
-		  change = -(int)curScoreMean / 2;
-		  if(Math.abs(change) > Math.abs(lastChange)) {
-			  if(lastChange < 0) {
-				  change = lastChange + 1;
-			  }
-			  else {
-				  change = lastChange - 1;
-			  }
-		  }
-		  
-		  lastPlayouts = playouts;
-		  lastChange = change;
-		  localAnalysis.moveBorder(change);
-	  }
+    double curScoreMean = 0;
+    int lastChange = 400;
+    int playouts = 0;
+    int lastPlayouts = 0;
+    int change = 0;
+
+    BoardHistoryNode node = board.getHistory().getCurrentHistoryNode();
+    if (!node.getData().bestMoves.isEmpty())
+      curScoreMean = node.getData().bestMoves.get(0).scoreMean;
+    else {
+      return;
+    }
+
+    while (true) {
+      playouts = node.getData().getPlayouts();
+      if (playouts == 0) {
+        try {
+          Thread.sleep(200);
+        } catch (InterruptedException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
+        if (playouts == 0) {
+          return;
+        }
+      }
+      if (lastPlayouts == playouts) {
+        try {
+          Thread.sleep(200);
+        } catch (InterruptedException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
+        if (lastPlayouts == playouts) {
+          return;
+        }
+      }
+      if (playouts < 50) {
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+        continue;
+      }
+      if (curScoreMean < 1 && curScoreMean > 1) {
+        return;
+      }
+      change = -(int) curScoreMean / 2;
+      if (Math.abs(change) > Math.abs(lastChange)) {
+        if (lastChange < 0) {
+          change = lastChange + 1;
+        } else {
+          change = lastChange - 1;
+        }
+      }
+
+      lastPlayouts = playouts;
+      lastChange = change;
+      localAnalysis.moveBorder(change);
+    }
   }
-//  while (node.previous().isPresent()) {
-//      double wr = node.getData().winrate;
-//      int playouts = node.getData().getPlayouts();
-//      if (node == curMove) {
-//        LALeelaz.WinrateStats stats = Lizzie.frame.localAnalysisFrame.leelaz.getWinrateStats();
-//        double bwr = stats.maxWinrate;
-//        if (bwr >= 0 && stats.totalPlayouts > playouts) {
-//          wr = bwr;
-//          playouts = stats.totalPlayouts;
-//        }
-//        
-//        double curscoreMean = node.getData().bestMoves.get(0).scoreMean;
-  
+  //  while (node.previous().isPresent()) {
+  //      double wr = node.getData().winrate;
+  //      int playouts = node.getData().getPlayouts();
+  //      if (node == curMove) {
+  //        LALeelaz.WinrateStats stats = Lizzie.frame.localAnalysisFrame.leelaz.getWinrateStats();
+  //        double bwr = stats.maxWinrate;
+  //        if (bwr >= 0 && stats.totalPlayouts > playouts) {
+  //          wr = bwr;
+  //          playouts = stats.totalPlayouts;
+  //        }
+  //
+  //        double curscoreMean = node.getData().bestMoves.get(0).scoreMean;
+
   /** Clears related status from empty board. */
   public void clear() {
     if (winrateGraph != null) {
@@ -440,7 +430,7 @@ public class LocalAnalysisFrame extends MainFrame {
    * @param g0 not used
    */
   public void paintMainPanel(Graphics g0) {
-    //autosaveMaybe();
+    // autosaveMaybe();
 
     int width = mainPanel.getWidth();
     int height = mainPanel.getHeight();
@@ -762,13 +752,17 @@ public class LocalAnalysisFrame extends MainFrame {
       boardRenderer.setupSizeParameters();
       boardRenderer.draw(g);
 
-      if (Lizzie.frame.localAnalysisFrame.leelaz != null && Lizzie.frame.localAnalysisFrame.leelaz.isLoaded()) {
+      if (Lizzie.frame.localAnalysisFrame.leelaz != null
+          && Lizzie.frame.localAnalysisFrame.leelaz.isLoaded()) {
         if (Lizzie.config.showStatus) {
-          String statusKey = "LizzieFrame.display." + (Lizzie.frame.localAnalysisFrame.leelaz.isPondering() ? "on" : "off");
+          String statusKey =
+              "LizzieFrame.display."
+                  + (Lizzie.frame.localAnalysisFrame.leelaz.isPondering() ? "on" : "off");
           String statusText = resourceBundle.getString(statusKey);
           String ponderingText = resourceBundle.getString("LizzieFrame.display.pondering");
           String switching = resourceBundle.getString("LizzieFrame.prompt.switching");
-          String switchingText = Lizzie.frame.localAnalysisFrame.leelaz.switching() ? switching : "";
+          String switchingText =
+              Lizzie.frame.localAnalysisFrame.leelaz.switching() ? switching : "";
           String weightText = Lizzie.frame.localAnalysisFrame.leelaz.currentWeight();
           String text = ponderingText + " " + statusText + " " + weightText + " " + switchingText;
           drawPonderingState(g, text, ponderingX, ponderingY, ponderingSize);
@@ -892,7 +886,8 @@ public class LocalAnalysisFrame extends MainFrame {
     FontMetrics fm = g.getFontMetrics(font);
     int stringWidth = fm.stringWidth(text);
     // Truncate too long text when display switching prompt
-    if (Lizzie.frame.localAnalysisFrame.leelaz != null && Lizzie.frame.localAnalysisFrame.leelaz.isLoaded()) {
+    if (Lizzie.frame.localAnalysisFrame.leelaz != null
+        && Lizzie.frame.localAnalysisFrame.leelaz.isLoaded()) {
       int mainBoardX = boardRenderer.getLocation().x;
       if (mainPanel.getWidth() > mainPanel.getHeight()
           && (mainBoardX > x)
@@ -1062,8 +1057,7 @@ public class LocalAnalysisFrame extends MainFrame {
       curWR = board.getHistory().getData().winrate;
       validWinrate = board.getHistory().getData().getPlayouts() > 0;
     }
-    if (isPlayingAgainstLeelaz
-        && playerIsBlack == !board.getHistory().getData().blackToPlay) {
+    if (isPlayingAgainstLeelaz && playerIsBlack == !board.getHistory().getData().blackToPlay) {
       validWinrate = false;
     }
 
@@ -1141,7 +1135,8 @@ public class LocalAnalysisFrame extends MainFrame {
     if (validLastWinrate && validWinrate) {
 
       if (Lizzie.config.handicapInsteadOfWinrate) {
-        double currHandicapedWR = Lizzie.frame.localAnalysisFrame.leelaz.winrateToHandicap(100 - curWR);
+        double currHandicapedWR =
+            Lizzie.frame.localAnalysisFrame.leelaz.winrateToHandicap(100 - curWR);
         double lastHandicapedWR = Lizzie.frame.localAnalysisFrame.leelaz.winrateToHandicap(lastWR);
         text =
             text
@@ -1301,58 +1296,57 @@ public class LocalAnalysisFrame extends MainFrame {
    * @param y y coordinate
    */
   public void onClicked(int x, int y) {
-	    // Check for board click
-	    Optional<int[]> boardCoordinates = boardRenderer.convertScreenToCoordinates(x, y);
-	    int moveNumber = winrateGraph.moveNumber(x, y);
+    // Check for board click
+    Optional<int[]> boardCoordinates = boardRenderer.convertScreenToCoordinates(x, y);
+    int moveNumber = winrateGraph.moveNumber(x, y);
 
-	    if (boardCoordinates.isPresent()) {
-	      int[] coords = boardCoordinates.get();
-	      if (board.inAnalysisMode()) board.toggleAnalysis();
-	      if (!isPlayingAgainstLeelaz || (playerIsBlack == board.getData().blackToPlay)) {
-	        switch(tool1) {
-	          case 1:
-		         board.place(coords[0], coords[1]);
-		         break;
-	          case 0:
-	        	 coords[1] = 19 - coords[1];
-	             if(coordinate1 == null) {
-	                coordinate1 = coords;
-	                tools.setCoordinate1Text(coordinate1);
-	             }
-	             else {
-	                coordinate2 = coords;
-	                tools.setCoordinate2Text(coordinate2);
-	                tool1 = 1;
-	                LocalAnalysisDialog localAnalysisDialog = new LocalAnalysisDialog(tools.coordinate1 , tools.coordinate2);
-	                if(Lizzie.config.showLocalAnalysisStartDialog)
-	                   localAnalysisDialog.setVisible(true);
-	             }
-	             break;
-	          case 2:
-	             localAnalysis.setStoneOnRealBoard(coords);
-	             break;
-	          case 3:
-		         localAnalysis.deleteStoneOnRealBoard(coords);
-		         break;
-	          case 4:
-		         localAnalysis.setGroupVerticalOnRealBoard(coords);
-		         break;
-	          case 5:
-		         localAnalysis.setGroupHorizontalOnRealBoard(coords);
-		         break;
-	          case 6:
-		         break;
-	        }
-	      }
-	    if (Lizzie.config.showWinrate && moveNumber >= 0) {
-	      isPlayingAgainstLeelaz = false;
-	      board.goToMoveNumberBeyondBranch(moveNumber);
-	    }
-	    if (Lizzie.config.showVariationGraph) {
-	      variationTree.onClicked(x, y);
-	    }
-	    repaint();
-	  }
+    if (boardCoordinates.isPresent()) {
+      int[] coords = boardCoordinates.get();
+      if (board.inAnalysisMode()) board.toggleAnalysis();
+      if (!isPlayingAgainstLeelaz || (playerIsBlack == board.getData().blackToPlay)) {
+        switch (tool1) {
+          case 1:
+            board.place(coords[0], coords[1]);
+            break;
+          case 0:
+            coords[1] = 19 - coords[1];
+            if (coordinate1 == null) {
+              coordinate1 = coords;
+              tools.setCoordinate1Text(coordinate1);
+            } else {
+              coordinate2 = coords;
+              tools.setCoordinate2Text(coordinate2);
+              tool1 = 1;
+              LocalAnalysisDialog localAnalysisDialog =
+                  new LocalAnalysisDialog(tools.coordinate1, tools.coordinate2);
+              if (Lizzie.config.showLocalAnalysisStartDialog) localAnalysisDialog.setVisible(true);
+            }
+            break;
+          case 2:
+            localAnalysis.setStoneOnRealBoard(coords);
+            break;
+          case 3:
+            localAnalysis.deleteStoneOnRealBoard(coords);
+            break;
+          case 4:
+            localAnalysis.setGroupVerticalOnRealBoard(coords);
+            break;
+          case 5:
+            localAnalysis.setGroupHorizontalOnRealBoard(coords);
+            break;
+          case 6:
+            break;
+        }
+      }
+      if (Lizzie.config.showWinrate && moveNumber >= 0) {
+        isPlayingAgainstLeelaz = false;
+        board.goToMoveNumberBeyondBranch(moveNumber);
+      }
+      if (Lizzie.config.showVariationGraph) {
+        variationTree.onClicked(x, y);
+      }
+      repaint();
+    }
   }
 
   public void onDoubleClicked(int x, int y) {
@@ -1440,22 +1434,22 @@ public class LocalAnalysisFrame extends MainFrame {
    */
   @Override
   public boolean processCommentMouseWheelMoved(MouseWheelEvent e) {
-//    if (Lizzie.config.showComment && commentRect.contains(e.getX(), e.getY())) {
-//      scrollPane.dispatchEvent(e);
-//      createCommentImage(true, commentRect.width, commentRect.height);
-//      getGraphics()
-//          .drawImage(
-//              cachedCommentImage,
-//              commentRect.x,
-//              commentRect.y,
-//              commentRect.width,
-//              commentRect.height,
-//              null);
-//      return true;
-//    } else {
-//      return false;
-//    }
-	  return false;
+    //    if (Lizzie.config.showComment && commentRect.contains(e.getX(), e.getY())) {
+    //      scrollPane.dispatchEvent(e);
+    //      createCommentImage(true, commentRect.width, commentRect.height);
+    //      getGraphics()
+    //          .drawImage(
+    //              cachedCommentImage,
+    //              commentRect.x,
+    //              commentRect.y,
+    //              commentRect.width,
+    //              commentRect.height,
+    //              null);
+    //      return true;
+    //    } else {
+    //      return false;
+    //    }
+    return false;
   }
 
   /**
@@ -1465,43 +1459,44 @@ public class LocalAnalysisFrame extends MainFrame {
    * @param w
    * @param h
    */
-//  public void createCommentImage(boolean forceRefresh, int w, int h) {
-//    if (forceRefresh || scrollPane.getWidth() != w || scrollPane.getHeight() != h) {
-//      if (w > 0 && h > 0) {
-//        scrollPane.setSize(w, h);
-//        cachedCommentImage =
-//            new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
-//        Graphics2D g2 = cachedCommentImage.createGraphics();
-//        scrollPane.doLayout();
-//        scrollPane.addNotify();
-//        scrollPane.validate();
-//        scrollPane.printAll(g2);
-//        g2.dispose();
-//      }
-//    }
-//  }
-  
+  //  public void createCommentImage(boolean forceRefresh, int w, int h) {
+  //    if (forceRefresh || scrollPane.getWidth() != w || scrollPane.getHeight() != h) {
+  //      if (w > 0 && h > 0) {
+  //        scrollPane.setSize(w, h);
+  //        cachedCommentImage =
+  //            new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
+  //        Graphics2D g2 = cachedCommentImage.createGraphics();
+  //        scrollPane.doLayout();
+  //        scrollPane.addNotify();
+  //        scrollPane.validate();
+  //        scrollPane.printAll(g2);
+  //        g2.dispose();
+  //      }
+  //    }
+  //  }
+
   public void createToolsImage(int w, int h) {
-	if (w > 0 && h > 0) {
-	  tools.setSize(w, h);
-	  cachedToolsImage = new  BufferedImage(tools.getWidth(), tools.getHeight(), TYPE_INT_ARGB);
-	  Graphics2D g2 = cachedToolsImage.createGraphics();
-	  tools.doLayout();
-	  tools.addNotify();
-	  tools.validate();
-	  tools.printAll(g2);
+    if (w > 0 && h > 0) {
+      tools.setSize(w, h);
+      cachedToolsImage = new BufferedImage(tools.getWidth(), tools.getHeight(), TYPE_INT_ARGB);
+      Graphics2D g2 = cachedToolsImage.createGraphics();
+      tools.doLayout();
+      tools.addNotify();
+      tools.validate();
+      tools.printAll(g2);
       g2.dispose();
-	}
+    }
   }
 
   private void autosaveMaybe() {
-//	    int interval =
-//	            Lizzie.config.config.getJSONObject("ui").getInt("autosave-interval-seconds") * 1000;
-//	        long currentTime = System.currentTimeMillis();
-//	        if (interval > 0 && currentTime - lastAutosaveTime >= interval) {
-//	          Lizzie.board.autosave();
-//	          lastAutosaveTime = currentTime;
-//	        }
+    //	    int interval =
+    //	            Lizzie.config.config.getJSONObject("ui").getInt("autosave-interval-seconds") *
+    // 1000;
+    //	        long currentTime = System.currentTimeMillis();
+    //	        if (interval > 0 && currentTime - lastAutosaveTime >= interval) {
+    //	          Lizzie.board.autosave();
+    //	          lastAutosaveTime = currentTime;
+    //	        }
   }
 
   public void startRawBoard() {
@@ -1569,34 +1564,34 @@ public class LocalAnalysisFrame extends MainFrame {
    * @param w
    * @param h
    */
-//  private void drawComment(Graphics2D g, int x, int y, int w, int h) {
-//    String comment = board.getHistory().getData().comment;
-//    int fontSize = (int) (min(mainPanel.getWidth(), mainPanel.getHeight()) * 0.0294);
-//    if (Lizzie.config.commentFontSize > 0) {
-//      fontSize = Lizzie.config.commentFontSize;
-//    } else if (fontSize < 16) {
-//      fontSize = 16;
-//    }
-//    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
-//    commentPane.setFont(font);
-//    comment = comment.replaceAll("(\r\n)|(\n)", "<br />").replaceAll(" ", "&nbsp;");
-//    commentPane.setText(comment);
-//    commentPane.setSize(w, h);
-//    createCommentImage(!comment.equals(this.cachedComment), w, h);
-//    commentRect = new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
-//    g.drawImage(
-//        cachedCommentImage,
-//        commentRect.x,
-//        commentRect.y,
-//        commentRect.width,
-//        commentRect.height,
-//        null);
-//    cachedComment = comment;
-//  }
-  
+  //  private void drawComment(Graphics2D g, int x, int y, int w, int h) {
+  //    String comment = board.getHistory().getData().comment;
+  //    int fontSize = (int) (min(mainPanel.getWidth(), mainPanel.getHeight()) * 0.0294);
+  //    if (Lizzie.config.commentFontSize > 0) {
+  //      fontSize = Lizzie.config.commentFontSize;
+  //    } else if (fontSize < 16) {
+  //      fontSize = 16;
+  //    }
+  //    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
+  //    commentPane.setFont(font);
+  //    comment = comment.replaceAll("(\r\n)|(\n)", "<br />").replaceAll(" ", "&nbsp;");
+  //    commentPane.setText(comment);
+  //    commentPane.setSize(w, h);
+  //    createCommentImage(!comment.equals(this.cachedComment), w, h);
+  //    commentRect = new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
+  //    g.drawImage(
+  //        cachedCommentImage,
+  //        commentRect.x,
+  //        commentRect.y,
+  //        commentRect.width,
+  //        commentRect.height,
+  //        null);
+  //    cachedComment = comment;
+  //  }
+
   /**
    * Draws the image for the tools
-   * 
+   *
    * @param g
    * @param x
    * @param y
@@ -1604,27 +1599,23 @@ public class LocalAnalysisFrame extends MainFrame {
    * @param h
    */
   private void drawTools(Graphics2D g, int x, int y, int w, int h) {
-	  tools.setSize(w, h);
-	  createToolsImage(w, h);
-	  toolsRect = new Rectangle(x, y, tools.getWidth(), tools.getHeight());
-	  tools.setBounds(toolsRect);
-	  tools.setVisible(true);
-	  g.drawImage(
-	        cachedToolsImage,
-	        toolsRect.x,
-	        toolsRect.y,
-	        toolsRect.width,
-	        toolsRect.height,
-	        null);	  
+    tools.setSize(w, h);
+    createToolsImage(w, h);
+    toolsRect = new Rectangle(x, y, tools.getWidth(), tools.getHeight());
+    tools.setBounds(toolsRect);
+    tools.setVisible(true);
+    g.drawImage(
+        cachedToolsImage, toolsRect.x, toolsRect.y, toolsRect.width, toolsRect.height, null);
   }
-  
+
   public void replayBranch(boolean generateGif) {
     if (isReplayVariation) return;
     int replaySteps = boardRenderer.getReplayBranch();
     if (replaySteps <= 0) return; // Bad steps or no branch
     int oriBranchLength = boardRenderer.getDisplayedBranchLength();
     isReplayVariation = true;
-    if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+    if (Lizzie.frame.localAnalysisFrame.leelaz.isPondering())
+      Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
     Runnable runnable =
         new Runnable() {
           public void run() {
@@ -1641,7 +1632,8 @@ public class LocalAnalysisFrame extends MainFrame {
             }
             setDisplayedBranchLength(boardRenderer, oriBranchLength);
             isReplayVariation = false;
-            if (!Lizzie.frame.localAnalysisFrame.leelaz.isPondering()) Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
+            if (!Lizzie.frame.localAnalysisFrame.leelaz.isPondering())
+              Lizzie.frame.localAnalysisFrame.leelaz.togglePonder();
           }
         };
     Thread thread = new Thread(runnable);
@@ -1715,13 +1707,13 @@ public class LocalAnalysisFrame extends MainFrame {
     countResults.button.setText(resourceBundle.getString("CountDialog.estimateButton.clickone"));
     if (byToolBar) countResults.setVisible(false);
   }
-   
+
   public void updateEngineMenu(List<Leelaz> engineList) {
-    //menu.updateEngineMenu(engineList);
+    // menu.updateEngineMenu(engineList);
   }
 
   public void updateEngineIcon(List<Leelaz> engineList, int currentEngineNo) {
-    //menu.updateEngineIcon(engineList, currentEngineNo);
+    // menu.updateEngineIcon(engineList, currentEngineNo);
   }
 
   public Optional<int[]> convertScreenToCoordinates(int x, int y) {
@@ -1793,46 +1785,46 @@ public class LocalAnalysisFrame extends MainFrame {
       return true;
     } else return false;
   }
-  
-  //overwritten functions from MainFrame 
-  
+
+  // overwritten functions from MainFrame
+
   @Override
   public void toggleGtpConsole() {
-	    if (gtpConsole != null) {
-	      gtpConsole.setVisible(!Lizzie.gtpConsole.isVisible());
-	    } else {
-	      gtpConsole = new LAGtpConsolePane(this);
-	      gtpConsole.setVisible(true);
-	    }
-	  }
-  
+    if (gtpConsole != null) {
+      gtpConsole.setVisible(!Lizzie.gtpConsole.isVisible());
+    } else {
+      gtpConsole = new LAGtpConsolePane(this);
+      gtpConsole.setVisible(true);
+    }
+  }
+
   @Override
   protected String loadingText() {
-	    return (leelaz != null) && leelaz.isDown()
-	        ? "Engine is down."
-	        : resourceBundle.getString("LizzieFrame.display.loading");
-	  }
-  
-  //copied from Utils:
+    return (leelaz != null) && leelaz.isDown()
+        ? "Engine is down."
+        : resourceBundle.getString("LizzieFrame.display.loading");
+  }
+
+  // copied from Utils:
   private static void setDisplayedBranchLength(LABoardRenderer board, int n) {
-	    board.setDisplayedBranchLength(n);
-	  }
-  
+    board.setDisplayedBranchLength(n);
+  }
+
   private static void doBranchSub(LABoardRenderer board, int moveTo) {
-	    if (moveTo > 0) {
-	      if (board.isShowingNormalBoard()) {
-	        setDisplayedBranchLength(board, 2);
-	      } else {
-	        board.incrementDisplayedBranchLength(1);
-	      }
-	    } else {
-	      if (board.isShowingNormalBoard()) {
-	        setDisplayedBranchLength(board, board.getReplayBranch());
-	      } else {
-	        if (board.getDisplayedBranchLength() > 1) {
-	          board.incrementDisplayedBranchLength(-1);
-	        }
-	      }
-	    }
-	  }
+    if (moveTo > 0) {
+      if (board.isShowingNormalBoard()) {
+        setDisplayedBranchLength(board, 2);
+      } else {
+        board.incrementDisplayedBranchLength(1);
+      }
+    } else {
+      if (board.isShowingNormalBoard()) {
+        setDisplayedBranchLength(board, board.getReplayBranch());
+      } else {
+        if (board.getDisplayedBranchLength() > 1) {
+          board.incrementDisplayedBranchLength(-1);
+        }
+      }
+    }
+  }
 }

@@ -496,11 +496,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_R:
         Lizzie.frame.replayBranch(e.isAltDown());
         break;
-      
+
       case VK_J:
-    	  Lizzie.frame.startLocalAnalysis();
-    	  break;
-    	  
+        Lizzie.frame.startLocalAnalysis();
+        break;
+
       case VK_OPEN_BRACKET:
         if (Lizzie.frame.boardPositionProportion > 0) {
           Lizzie.frame.boardPositionProportion--;
