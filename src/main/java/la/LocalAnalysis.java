@@ -11,8 +11,9 @@ import java.util.Arrays;
 public class LocalAnalysis {
 
   // static variables:
-  private static final int BOARDSIZE =
-      19; // it's currently not planned to support other board sizes
+  private static final int BOARDSIZE = 19;
+  // it's currently not planned to support other board sizes
+  private static final int B = BOARDSIZE; // delete
 
   private enum Area { // we will split the board into disjoint areas
     EMPTY,
@@ -30,15 +31,13 @@ public class LocalAnalysis {
   };
 
   // areas:
-  // TODO find a way to return to board position
-  // private final Stone[] boardCopy;	//copy of board position before analysis
   private Stone[] board; // board position which we will change during analysis
   private Area[] area;
 
   // points:
-  private int[] startCoordinates; // two points which we started with
+  private int[] startCoordinates; // two points which we start with
   private int[]
-      wallCornerPoint; // Corner Points for wall. 0=left bottom,1=right bottom,2=left top,3=right
+      wallCornerPoint; // Corner Points for wall. 0=left bottom,1=right bottom,2=left top,3=right//
   // top
   private int[]
       alivePoints; // stones which you can mark. at the start of the analysis they will connect to a
@@ -58,7 +57,7 @@ public class LocalAnalysis {
   private int blackKoThreats; // builds Ko threats for Black if positive and for White if negative
   private int
       maxKoThreatsBlack; // maximal amount of Ko threats for Black. depends on size of Whites eye
-  // area.
+  // space.
   private int maxKoThreatsWhite; // analog for White
   private int
       mirror; // if some bugs appear we can mirror the position then start again and mirror back,
@@ -66,7 +65,7 @@ public class LocalAnalysis {
   private boolean blackToMove; // true = Blacks turn, false = Whites turn
   private boolean
       playerInsideBlack; // surrounded player who tries to live. wall will be in the opposite
-  // colour. true=Black, false=White
+  // color. true=Black, false=White
   private boolean placeBlackStones; // color of single placed stones. true=black,false=white
   private boolean
       placeStonesAlternating; // color of single placed stones alternating or not. will change
@@ -227,9 +226,6 @@ public class LocalAnalysis {
 
   /** @param k Number of new Ko threats, negative for White Ko threats */
   public void setBlackKoThreats(int k) {
-    if (mirror != 0) {
-      restart();
-    }
     if (!allowKo) {
       blackKoThreats = 0;
     }
@@ -252,15 +248,6 @@ public class LocalAnalysis {
     wallDistance = w;
     restart();
   }
-
-  //	public void protectField(int a) {
-  //		area[a] = Area.PROTECTEDAREA;
-  //	}
-  //
-  //	public void unprotectField( int a ) {
-  //		area[a] = Area.EMPTY;
-  //	}
-  //
 
   public void setStoneOnRealBoard(int a[]) {
     setStoneOnRealBoard(translateCoordinates(a));
@@ -708,21 +695,20 @@ public class LocalAnalysis {
         alivePoints[i] = BOARDSIZE * BOARDSIZE + 1;
         return;
       } else {
-        // Fehlerausgabe: zu viele alivepoints gesetzt
+        // ERROR zu viele alivepoints gesetzt
         return;
       }
     }
   }
 
-  // TODO: search for points of PROTECETEDAREA and SEPARATIONAREA which can be changed
   /**
-   * moves the border between main areas to change the point difference. if positive Black gains p
+   * changes the color of some stones at the border between main areas. if positive Black gains p
    * points. else he looses p points.
    *
    * @param p number of points Black gains and White looses. If negative Black looses p points and
-   *     White wins p Points
+   *     White gains p Points
    */
-  public void moveBorder(int p) {
+  public void changePoints(int p) {
     if (p == 0) {
       refreshBoard();
       return;
@@ -740,7 +726,7 @@ public class LocalAnalysis {
               setStone(changingPoint);
               area[changingPoint] = Area.MAINAREABLACK;
               if (localLibertyCheck(changingPoint)) {
-                moveBorder(p - 1);
+                changePoints(p - 1);
                 return;
               } else {
                 area[changingPoint] = Area.MAINAREAWHITE;
@@ -751,9 +737,8 @@ public class LocalAnalysis {
             }
           }
         }
-        printError(39);
+        changePoints2(p);
         return;
-        // ERROR kein punkt gefunden, um grenze zu verschieben
       }
       if (p < 0) {
         for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++) {
@@ -767,7 +752,7 @@ public class LocalAnalysis {
               setStone(changingPoint);
               area[changingPoint] = Area.MAINAREAWHITE;
               if (localLibertyCheck(changingPoint)) {
-                moveBorder(p + 1);
+                changePoints(p + 1);
                 return;
               } else {
                 area[changingPoint] = Area.MAINAREABLACK;
@@ -778,8 +763,7 @@ public class LocalAnalysis {
             }
           }
         }
-        // ERROR kein punkt gefunden, um grenze zu verschieben
-        printError(39);
+        changePoints2(p);
         return;
       }
     }
@@ -807,7 +791,7 @@ public class LocalAnalysis {
             changingPoint = changingPoint - BOARDSIZE;
             setStone(changingPoint);
           } else {
-            if (changingPoint <= BOARDSIZE * BOARDSIZE - BOARDSIZE
+            if (changingPoint < BOARDSIZE * BOARDSIZE - BOARDSIZE
                 && area[changingPoint + BOARDSIZE] == Area.MAINAREAWHITE
                 && !check4Neighborhood(changingPoint + BOARDSIZE, Area.PROTECTEDAREA)
                 && !check4Neighborhood(changingPoint + BOARDSIZE, Area.SEPARATIONGROUPS)) {
@@ -843,14 +827,13 @@ public class LocalAnalysis {
                     }
                   }
                 }
-                // ERROR kein punkt gefunden, um grenze zu verschieben
               }
             }
           }
         }
       }
       if (localLibertyCheck(changingPoint)) {
-        moveBorder(p - 1);
+        changePoints(p - 1);
         return;
       } else {
         area[changingPoint] = Area.MAINAREAWHITE;
@@ -858,7 +841,7 @@ public class LocalAnalysis {
         setStone(changingPoint);
         placeBlackStones = true;
         changingPoint = BOARDSIZE * BOARDSIZE;
-        moveBorder(p);
+        changePoints(p);
         return;
       }
     } else { // if white gets more points
@@ -921,14 +904,13 @@ public class LocalAnalysis {
                     }
                   }
                 }
-                // ERROR kein punkt gefunden, um grenze zu verschieben
               }
             }
           }
         }
       }
       if (localLibertyCheck(changingPoint)) {
-        moveBorder(p + 1);
+        changePoints(p + 1);
         return;
       } else {
         area[changingPoint] = Area.MAINAREABLACK;
@@ -936,9 +918,124 @@ public class LocalAnalysis {
         setStone(changingPoint);
         placeBlackStones = false;
         changingPoint = BOARDSIZE * BOARDSIZE;
-        moveBorder(p);
+        changePoints(p);
         return;
       }
+    }
+  }
+
+  /**
+   * only used if changePoints(p) does not succeed checks if we can change the color of stones of
+   * the main areas next to separation group or protected area
+   */
+  private void changePoints2(int p) {
+    if (changingPoint != BOARDSIZE * BOARDSIZE) {
+      printError(52);
+      return;
+    }
+    if (p > 0) {
+      if (playerInsideBlack) {
+        for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++) {
+          if (area[i] == Area.MAINAREAWHITE) {
+            if (!check4Neighborhood(i, Area.MAINAREABLACK)
+                && area[i] != Area.EYESPACEWHITE
+                && check4Neighborhood(i, Area.SEPARATIONGROUPS)
+                && !check4Neighborhood(i, Area.PROTECTEDAREA)) {
+              changingPoint = i;
+              placeBlackStones = true;
+              setStone(changingPoint);
+              area[changingPoint] = Area.MAINAREABLACK;
+              if (localLibertyCheck(changingPoint)) {
+                changePoints(p - 1);
+                return;
+              } else {
+                area[changingPoint] = Area.MAINAREAWHITE;
+                placeBlackStones = false;
+                setStone(changingPoint);
+                placeBlackStones = true;
+              }
+            }
+          }
+        }
+      } else {
+        for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++) {
+          if (area[i] == Area.MAINAREAWHITE) {
+            if (!check4Neighborhood(i, Area.MAINAREABLACK)
+                && area[i] != Area.EYESPACEWHITE
+                && !check4Neighborhood(i, Area.SEPARATIONGROUPS)
+                && check4Neighborhood(i, Area.PROTECTEDAREA)) {
+              changingPoint = i;
+              placeBlackStones = true;
+              setStone(changingPoint);
+              area[changingPoint] = Area.MAINAREABLACK;
+              if (localLibertyCheck(changingPoint)) {
+                changePoints(p - 1);
+                return;
+              } else {
+                area[changingPoint] = Area.MAINAREAWHITE;
+                placeBlackStones = false;
+                setStone(changingPoint);
+                placeBlackStones = true;
+              }
+            }
+          }
+        }
+      }
+      printError(39);
+      return;
+      // ERROR kein punkt gefunden, um grenze zu verschieben
+    }
+    if (p < 0) {
+      if (playerInsideBlack) {
+        for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++) {
+          if (area[i] == Area.MAINAREABLACK) {
+            if (!check4Neighborhood(i, Area.MAINAREAWHITE)
+                && area[i] != Area.EYESPACEBLACK
+                && !check4Neighborhood(i, Area.SEPARATIONGROUPS)
+                && check4Neighborhood(i, Area.PROTECTEDAREA)) {
+              changingPoint = i;
+              placeBlackStones = false;
+              setStone(changingPoint);
+              area[changingPoint] = Area.MAINAREAWHITE;
+              if (localLibertyCheck(changingPoint)) {
+                changePoints(p + 1);
+                return;
+              } else {
+                area[changingPoint] = Area.MAINAREABLACK;
+                placeBlackStones = true;
+                setStone(changingPoint);
+                placeBlackStones = false;
+              }
+            }
+          }
+        }
+      } else {
+        for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++) {
+          if (area[i] == Area.MAINAREABLACK) {
+            if (!check4Neighborhood(i, Area.MAINAREAWHITE)
+                && area[i] != Area.EYESPACEBLACK
+                && check4Neighborhood(i, Area.SEPARATIONGROUPS)
+                && !check4Neighborhood(i, Area.PROTECTEDAREA)) {
+              changingPoint = i;
+              placeBlackStones = false;
+              setStone(changingPoint);
+              area[changingPoint] = Area.MAINAREAWHITE;
+              if (localLibertyCheck(changingPoint)) {
+                changePoints(p + 1);
+                return;
+              } else {
+                area[changingPoint] = Area.MAINAREABLACK;
+                placeBlackStones = true;
+                setStone(changingPoint);
+                placeBlackStones = false;
+              }
+            }
+          }
+        }
+      }
+      // ERROR kein punkt gefunden, um grenze zu verschieben
+      printError(39);
+      return;
     }
   }
 
@@ -956,7 +1053,7 @@ public class LocalAnalysis {
    * Returns to the point in the game there we started the Local Analysis. Deletes the branch of the
    * Local Analysis
    */
-  public void returnToGame() {
+  public void goToGameRoot() {
     //			int ret =
     //		            JOptionPane.showConfirmDialog(
     //		                null,
@@ -977,10 +1074,9 @@ public class LocalAnalysis {
       history = Lizzie.frame.localAnalysisFrame.board.getHistory();
       currentNode = history.getCurrentHistoryNode();
     }
-    Lizzie.frame.localAnalysisFrame.board.restoreMoveNumber();
+    // Lizzie.frame.localAnalysisFrame.board.restoreMoveNumber();
   }
 
-  // TODO really load from Configs
   private void loadConfig(int playerInside, int playerToMove, int blackKoThreats2) {
     maxAlivePoints = Lizzie.config.maxAlivePoints;
     wallDistance =
@@ -1065,17 +1161,71 @@ public class LocalAnalysis {
 
   /** mirror symmetrical use twice to get the same position */
   private void mirror1() {
-    //			Stone[] boardCopy = new Stone[board.length];
-    //			for(int a = 0; a < board.length; a++) {
-    //				boardCopy[a] = board[a];
-    //			}
-    //			for(int a = 0; a < board.length; a++) {
-    //				board[a] = boardCopy[B * yCoord(a) + B - 1 - xCoord(a)];
-    //			}
-    //			startCoordinates[0] = B * yCoord(startCoordinates[0]) + B - 1 -
-    // xCoord(startCoordinates[0]);
-    //			startCoordinates[1] = B * yCoord(startCoordinates[1]) + B - 1 -
-    // xCoord(startCoordinates[1]);
+    Stone[] boardCopy = new Stone[board.length];
+    for (int a = 0; a < board.length; a++) {
+      boardCopy[a] = board[a];
+    }
+    for (int a = 0; a < board.length; a++) {
+      board[a] = boardCopy[B * yCoord(a) + B - 1 - xCoord(a)];
+    }
+    Area[] areaCopy = new Area[B * B];
+    for (int a = 0; a < B * B; a++) {
+      areaCopy[a] = area[a];
+    }
+    for (int a = 0; a < board.length; a++) {
+      area[a] = areaCopy[B * yCoord(a) + B - 1 - xCoord(a)];
+    }
+    startCoordinates[0] = B * yCoord(startCoordinates[0]) + B - 1 - xCoord(startCoordinates[0]);
+    startCoordinates[1] = B * yCoord(startCoordinates[1]) + B - 1 - xCoord(startCoordinates[1]);
+    changingPoint = B * B;
+    eyeSpaceBlackPoint = B * yCoord(eyeSpaceBlackPoint) + B - 1 - xCoord(eyeSpaceBlackPoint);
+    if (!isCorner(eyeSpaceBlackPoint)) {
+      if (isBorder(eyeSpaceBlackPoint)) {
+        while (isFieldInBoard(eyeSpaceBlackPoint - 1)
+            && area[eyeSpaceBlackPoint - 1] == Area.EYESPACEBLACK
+            && isBorder(eyeSpaceBlackPoint - 1)) {
+          eyeSpaceBlackPoint--;
+        }
+        while (isFieldInBoard(eyeSpaceBlackPoint - B)
+            && area[eyeSpaceBlackPoint - B] == Area.EYESPACEBLACK
+            && isBorder(eyeSpaceBlackPoint - B)) {
+          eyeSpaceBlackPoint = eyeSpaceBlackPoint - B;
+        }
+      } else {
+        while (isFieldInBoard(eyeSpaceBlackPoint - 1)
+            && area[eyeSpaceBlackPoint - 1] == Area.EYESPACEBLACK) {
+          eyeSpaceBlackPoint--;
+        }
+        while (isFieldInBoard(eyeSpaceBlackPoint - B)
+            && area[eyeSpaceBlackPoint - B] == Area.EYESPACEBLACK) {
+          eyeSpaceBlackPoint = eyeSpaceBlackPoint - B;
+        }
+      }
+    }
+    eyeSpaceWhitePoint = B * yCoord(eyeSpaceWhitePoint) + B - 1 - xCoord(eyeSpaceWhitePoint);
+    if (!isCorner(eyeSpaceWhitePoint)) {
+      if (isBorder(eyeSpaceWhitePoint)) {
+        while (isFieldInBoard(eyeSpaceWhitePoint - 1)
+            && area[eyeSpaceWhitePoint - 1] == Area.EYESPACEWHITE
+            && isBorder(eyeSpaceWhitePoint - 1)) {
+          eyeSpaceWhitePoint--;
+        }
+        while (isFieldInBoard(eyeSpaceWhitePoint - B)
+            && area[eyeSpaceWhitePoint - B] == Area.EYESPACEWHITE
+            && isBorder(eyeSpaceWhitePoint - B)) {
+          eyeSpaceWhitePoint = eyeSpaceWhitePoint - B;
+        }
+      } else {
+        while (isFieldInBoard(eyeSpaceWhitePoint - 1)
+            && area[eyeSpaceWhitePoint - 1] == Area.EYESPACEWHITE) {
+          eyeSpaceWhitePoint--;
+        }
+        while (isFieldInBoard(eyeSpaceWhitePoint - B)
+            && area[eyeSpaceWhitePoint - B] == Area.EYESPACEWHITE) {
+          eyeSpaceWhitePoint = eyeSpaceWhitePoint - B;
+        }
+      }
+    }
     return;
   }
 
@@ -1088,10 +1238,68 @@ public class LocalAnalysis {
     for (int a = 0; a < board.length; a++) {
       board[a] = boardCopy[BOARDSIZE * (BOARDSIZE - 1 - xCoord(a)) + yCoord(a)];
     }
+    Area[] areaCopy = new Area[B * B];
+    for (int a = 0; a < B * B; a++) {
+      areaCopy[a] = area[a];
+    }
+    for (int a = 0; a < board.length; a++) {
+      area[a] = areaCopy[BOARDSIZE * (BOARDSIZE - 1 - xCoord(a)) + yCoord(a)];
+    }
     startCoordinates[0] =
         BOARDSIZE * xCoord(startCoordinates[0]) + BOARDSIZE - 1 - yCoord(startCoordinates[0]);
     startCoordinates[1] =
         BOARDSIZE * xCoord(startCoordinates[1]) + BOARDSIZE - 1 - yCoord(startCoordinates[1]);
+    changingPoint = BOARDSIZE * B;
+    eyeSpaceBlackPoint =
+        BOARDSIZE * xCoord(eyeSpaceBlackPoint) + BOARDSIZE - 1 - yCoord(eyeSpaceBlackPoint);
+    if (!isCorner(eyeSpaceBlackPoint)) {
+      if (isBorder(eyeSpaceBlackPoint)) {
+        while (isFieldInBoard(eyeSpaceBlackPoint - 1)
+            && area[eyeSpaceBlackPoint - 1] == Area.EYESPACEBLACK
+            && isBorder(eyeSpaceBlackPoint - 1)) {
+          eyeSpaceBlackPoint--;
+        }
+        while (isFieldInBoard(eyeSpaceBlackPoint - B)
+            && area[eyeSpaceBlackPoint - B] == Area.EYESPACEBLACK
+            && isBorder(eyeSpaceBlackPoint - B)) {
+          eyeSpaceBlackPoint = eyeSpaceBlackPoint - B;
+        }
+      } else {
+        while (isFieldInBoard(eyeSpaceBlackPoint - 1)
+            && area[eyeSpaceBlackPoint - 1] == Area.EYESPACEBLACK) {
+          eyeSpaceBlackPoint--;
+        }
+        while (isFieldInBoard(eyeSpaceBlackPoint - B)
+            && area[eyeSpaceBlackPoint - B] == Area.EYESPACEBLACK) {
+          eyeSpaceBlackPoint = eyeSpaceBlackPoint - B;
+        }
+      }
+    }
+    eyeSpaceWhitePoint =
+        BOARDSIZE * xCoord(eyeSpaceWhitePoint) + BOARDSIZE - 1 - yCoord(eyeSpaceWhitePoint);
+    if (!isCorner(eyeSpaceWhitePoint)) {
+      if (isBorder(eyeSpaceWhitePoint)) {
+        while (isFieldInBoard(eyeSpaceWhitePoint - 1)
+            && area[eyeSpaceWhitePoint - 1] == Area.EYESPACEWHITE
+            && isBorder(eyeSpaceWhitePoint - 1)) {
+          eyeSpaceWhitePoint--;
+        }
+        while (isFieldInBoard(eyeSpaceWhitePoint - B)
+            && area[eyeSpaceWhitePoint - B] == Area.EYESPACEWHITE
+            && isBorder(eyeSpaceWhitePoint - B)) {
+          eyeSpaceWhitePoint = eyeSpaceWhitePoint - B;
+        }
+      } else {
+        while (isFieldInBoard(eyeSpaceWhitePoint - 1)
+            && area[eyeSpaceWhitePoint - 1] == Area.EYESPACEWHITE) {
+          eyeSpaceWhitePoint--;
+        }
+        while (isFieldInBoard(eyeSpaceWhitePoint - B)
+            && area[eyeSpaceWhitePoint - B] == Area.EYESPACEWHITE) {
+          eyeSpaceWhitePoint = eyeSpaceWhitePoint - B;
+        }
+      }
+    }
     return;
   }
 
@@ -1113,6 +1321,7 @@ public class LocalAnalysis {
     }
   }
 
+  // TODO eyes at the opposite border will not be created. so mirror doesn't work
   /**
    * creates eyes for Blacks main area
    *
@@ -1120,7 +1329,7 @@ public class LocalAnalysis {
    */
   private boolean createBlackEyes(boolean searchArea) {
     placeBlackStones = true;
-    // find our EYEROOM
+    // find our EYESPACE
     int startPoint;
     if (searchArea) {
       startPoint = findAreaType(Area.EYESPACEBLACK);
@@ -1129,7 +1338,7 @@ public class LocalAnalysis {
       startPoint = eyeSpaceBlackPoint;
     }
     if (startPoint == BOARDSIZE * BOARDSIZE) {
-      // Fehlermeldung: kein augenraum gefunden
+      // ERROR: kein augenraum gefunden
       return false;
     }
     int height = 0;
@@ -1194,6 +1403,35 @@ public class LocalAnalysis {
             if (checkSpaceForLivingGroup(
                 BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE, Area.EYESPACEBLACK)) {
               setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE);
+              return true;
+            }
+          }
+          if (startPoint == BOARDSIZE - 1) {
+            if (checkSpaceForLivingGroup(BOARDSIZE - 1, Area.EYESPACEWHITE)) {
+              setUnprotectedLivingGroup(BOARDSIZE - 1);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(BOARDSIZE - 2, Area.EYESPACEWHITE)) {
+              setUnprotectedLivingGroup(BOARDSIZE - 2);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(2 * BOARDSIZE - 1, Area.EYESPACEWHITE)) {
+              setUnprotectedLivingGroup(2 * BOARDSIZE - 1);
+              return true;
+            }
+          }
+          if (startPoint == BOARDSIZE * BOARDSIZE - 1) {
+            if (checkSpaceForLivingGroup(BOARDSIZE * BOARDSIZE - 1, Area.EYESPACEWHITE)) {
+              setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - 1);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(BOARDSIZE * BOARDSIZE - 2, Area.EYESPACEWHITE)) {
+              setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - 2);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(
+                BOARDSIZE * BOARDSIZE - BOARDSIZE - 1, Area.EYESPACEWHITE)) {
+              setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - BOARDSIZE - 1);
               return true;
             }
           }
@@ -1280,6 +1518,56 @@ public class LocalAnalysis {
                   }
               }
             }
+            if (startPoint == BOARDSIZE - 1) {
+              switch (height) {
+                case 2:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE - 1);
+                      deleteStone(BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE - 3);
+                      deleteStone(BOARDSIZE - 4);
+                      return true;
+                  }
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE - 1);
+                      deleteStone(BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE - 3);
+                      deleteStone(2 * BOARDSIZE - 3);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE * BOARDSIZE - 1) {
+              switch (height) {
+                case 2:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE * BOARDSIZE - 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 3);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 4);
+                      return true;
+                  }
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE * BOARDSIZE - 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 3);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 3);
+                      return true;
+                  }
+              }
+            }
           }
           if (isBorder(startPoint)) {
             if (startPoint < BOARDSIZE) {
@@ -1327,9 +1615,6 @@ public class LocalAnalysis {
                       return true;
                   }
               }
-            }
-            if (startPoint % BOARDSIZE == 0) {
-              // ERROR
             }
           }
           switch (height) {
@@ -1493,6 +1778,38 @@ public class LocalAnalysis {
                   }
               }
             }
+            if (startPoint == BOARDSIZE - 1) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      setStone(BOARDSIZE - 1);
+                      setStone(BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE - 3);
+                      deleteStone(2 * BOARDSIZE - 1);
+                      setStone(2 * BOARDSIZE - 3);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE * BOARDSIZE - 1) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      setStone(BOARDSIZE * BOARDSIZE - 1);
+                      setStone(BOARDSIZE * BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 3);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 1);
+                      setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 3);
+                      return true;
+                  }
+              }
+            }
           }
           if (isBorder(startPoint)) {
             if (startPoint < BOARDSIZE) {
@@ -1650,6 +1967,40 @@ public class LocalAnalysis {
                       setStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE);
                       setStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE + 1);
                       deleteStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE + 3);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE - 1) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE - 1);
+                      deleteStone(BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE - 3);
+                      deleteStone(BOARDSIZE - 4);
+                      setStone(2 * BOARDSIZE - 1);
+                      setStone(2 * BOARDSIZE - 2);
+                      deleteStone(2 * BOARDSIZE - 4);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE * BOARDSIZE - 1) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE * BOARDSIZE - 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 3);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 4);
+                      setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 1);
+                      setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 4);
                       return true;
                   }
               }
@@ -1824,7 +2175,7 @@ public class LocalAnalysis {
   /** creates eyes for Blacks main area */
   private boolean createWhiteEyes(boolean searchArea) {
     placeBlackStones = false;
-    // find our EYEROOM
+    // find our EYESPACE
     int startPoint;
     if (searchArea) {
       startPoint = findAreaType(Area.EYESPACEWHITE);
@@ -1898,6 +2249,36 @@ public class LocalAnalysis {
             if (checkSpaceForLivingGroup(
                 BOARDSIZE * BOARDSIZE - BOARDSIZE - 1, Area.EYESPACEWHITE)) {
               setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - BOARDSIZE - 1);
+              return true;
+            }
+          }
+          if (startPoint == 0) {
+            if (checkSpaceForLivingGroup(0, Area.EYESPACEBLACK)) {
+              setUnprotectedLivingGroup(0);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(1, Area.EYESPACEBLACK)) {
+              setUnprotectedLivingGroup(1);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(BOARDSIZE, Area.EYESPACEBLACK)) {
+              setUnprotectedLivingGroup(BOARDSIZE);
+              return true;
+            }
+          }
+          if (startPoint == BOARDSIZE * BOARDSIZE - BOARDSIZE) {
+            if (checkSpaceForLivingGroup(BOARDSIZE * BOARDSIZE - BOARDSIZE, Area.EYESPACEBLACK)) {
+              setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - BOARDSIZE);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(
+                BOARDSIZE * BOARDSIZE - BOARDSIZE + 1, Area.EYESPACEBLACK)) {
+              setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - BOARDSIZE + 1);
+              return true;
+            }
+            if (checkSpaceForLivingGroup(
+                BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE, Area.EYESPACEBLACK)) {
+              setUnprotectedLivingGroup(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE);
               return true;
             }
           }
@@ -1980,6 +2361,56 @@ public class LocalAnalysis {
                       deleteStone(BOARDSIZE * BOARDSIZE - 2);
                       deleteStone(BOARDSIZE * BOARDSIZE - 3);
                       deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 3);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == 0) {
+              switch (height) {
+                case 2:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(0);
+                      deleteStone(1);
+                      deleteStone(2);
+                      deleteStone(3);
+                      return true;
+                  }
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      deleteStone(0);
+                      deleteStone(1);
+                      deleteStone(2);
+                      deleteStone(BOARDSIZE + 2);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE * BOARDSIZE - BOARDSIZE) {
+              switch (height) {
+                case 2:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 3);
+                      return true;
+                  }
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE + 2);
                       return true;
                   }
               }
@@ -2197,6 +2628,38 @@ public class LocalAnalysis {
                   }
               }
             }
+            if (startPoint == 0) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      setStone(0);
+                      setStone(1);
+                      deleteStone(2);
+                      deleteStone(BOARDSIZE);
+                      setStone(BOARDSIZE + 2);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE * BOARDSIZE - BOARDSIZE) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 4:
+                    case 5:
+                    case 6:
+                      setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE);
+                      setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE);
+                      setStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE + 2);
+                      return true;
+                  }
+              }
+            }
           }
           if (isBorder(startPoint)) {
             if (startPoint < BOARDSIZE) {
@@ -2354,6 +2817,40 @@ public class LocalAnalysis {
                       setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 1);
                       setStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 2);
                       deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE - 4);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == 0) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(0);
+                      deleteStone(1);
+                      deleteStone(2);
+                      deleteStone(3);
+                      setStone(BOARDSIZE);
+                      setStone(BOARDSIZE + 1);
+                      deleteStone(BOARDSIZE + 3);
+                      return true;
+                  }
+              }
+            }
+            if (startPoint == BOARDSIZE * BOARDSIZE - BOARDSIZE) {
+              switch (height) {
+                case 3:
+                  switch (width) {
+                    case 5:
+                    case 6:
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 2);
+                      deleteStone(BOARDSIZE * BOARDSIZE - BOARDSIZE + 3);
+                      setStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE);
+                      setStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE + 1);
+                      deleteStone(BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE + 3);
                       return true;
                   }
               }
@@ -2537,11 +3034,13 @@ public class LocalAnalysis {
       if (area[a] == Area.MAINAREABLACK) {
         if (!checkBoard[a]) {
           Arrays.fill(checkBoard, false);
-          if (!connectToArea2(a, checkBoard, eyelessArea, Area.EYESPACEBLACK, Stone.BLACK)) {
+          if (!connectToArea2(a, checkBoard, eyelessArea, Area.EYESPACEBLACK, Stone.BLACK)) {;
             Arrays.fill(checkBoard, false);
+            Arrays.fill(eyelessArea, false);
             if (playerInsideBlack
                 ? !connectToArea2(a, checkBoard, eyelessArea, Area.SEPARATIONGROUPS, Stone.BLACK)
                 : !connectToArea2(a, checkBoard, eyelessArea, Area.PROTECTEDAREA, Stone.BLACK)) {
+              Arrays.fill(checkBoard, false);
               for (int b = 0; b < BOARDSIZE * BOARDSIZE; b++) {
                 if (eyelessArea[b] && area[b] == Area.MAINAREABLACK) {
                   if (checkSpaceForLivingGroupAndChangeType(
@@ -2552,10 +3051,8 @@ public class LocalAnalysis {
                     break;
                   }
                 }
-                if (b
-                    == BOARDSIZE * BOARDSIZE
-                        - 1) { // if we can't get the group alive, we will change the color of the
-                  // group
+                if (b == BOARDSIZE * BOARDSIZE - 1) {
+                  // if we can't revive the group, we will change the color of the group
                   printError(36);
                   placeBlackStones = false;
                   for (int c = 0; c < BOARDSIZE * BOARDSIZE; c++) {
@@ -2564,26 +3061,99 @@ public class LocalAnalysis {
                     }
                   }
                   Arrays.fill(checkBoard, false);
+                  // now we have to separate groups which shouldn't be connected
                   for (int c = 0; c < BOARDSIZE * BOARDSIZE; c++) {
-                    if (playerInsideBlack) {
-                      if (connectToArea(c, checkBoard, eyelessArea, Area.PROTECTEDAREA, Stone.WHITE)
-                          && connectToArea(
-                              c, checkBoard, eyelessArea, Area.EYESPACEWHITE, Stone.WHITE)) {
-                        // TODO
-                        printError(37);
+                    if (eyelessArea[c]) {
+                      Arrays.fill(checkBoard, false);
+                      if (playerInsideBlack) {
+                        if (connectToArea(
+                                c, checkBoard, eyelessArea, Area.PROTECTEDAREA, Stone.WHITE)
+                            && connectToArea(
+                                c, checkBoard, eyelessArea, Area.EYESPACEWHITE, Stone.WHITE)) {
+                          boolean[] checkBoard2;
+                          boolean[] checkBoard3 = new boolean[BOARDSIZE * BOARDSIZE];
+                          dummy = B * B;
+                          for (int d = 0; d < BOARDSIZE * BOARDSIZE; d++) {
+                            checkBoard2 = copyBooleanBoard(checkBoard3);
+                            if (connectToArea3(c, checkBoard2, Area.SEPARATIONGROUPS, board[c])) {
+                              if (lateSeparation(dummy)) {
+                                dummy = 0;
+                                break;
+                              }
+                              checkBoard3[dummy] = true;
+                              dummy = B * B;
+                            }
+                          }
+                        }
+                      } else {
+                        if (connectToArea(
+                                c, checkBoard, eyelessArea, Area.SEPARATIONGROUPS, Stone.WHITE)
+                            && connectToArea(
+                                c, checkBoard, eyelessArea, Area.EYESPACEWHITE, Stone.WHITE)) {
+                          placeBlackStones = true;
+                          for (int d = 0; d < BOARDSIZE * BOARDSIZE; d++) {
+                            if (area[d] == Area.MAINAREAWHITE) {
+                              if (check4Neighborhood(d, Area.SEPARATIONGROUPS)) {
+                                setStone(d);
+                                boolean[] checkBoard3 = new boolean[BOARDSIZE * BOARDSIZE];
+                                if (!connectToAreaAndChange(
+                                    d, checkBoard3, Area.PROTECTEDAREA, Stone.BLACK)) {
+                                  boolean[] checkBoard2 = new boolean[BOARDSIZE * BOARDSIZE];
+                                  connectToAreaAndChange(
+                                      d, checkBoard2, Area.MAINAREABLACK, Stone.BLACK);
+                                }
+                              }
+                            }
+                          }
+                          for (int d = 0; d < BOARDSIZE * BOARDSIZE; d++) {
+                            if (area[d] == Area.MAINAREAWHITE) {
+                              if (check4Neighborhood(d, Area.SEPARATIONGROUPS)) {
+                                setStone(d);
+                                boolean[] checkBoard3 = new boolean[BOARDSIZE * BOARDSIZE];
+                                if (!connectToAreaAndChange(
+                                    d, checkBoard3, Area.PROTECTEDAREA, Stone.BLACK)) {
+                                  boolean[] checkBoard2 = new boolean[BOARDSIZE * BOARDSIZE];
+                                  if (!connectToAreaAndChange(
+                                      d, checkBoard2, Area.MAINAREABLACK, Stone.BLACK)) {
+                                    if (!check4Neighborhood(d, Area.PROTECTEDAREA)) {
+                                      if (check4Neighborhood(d + 1, Area.PROTECTEDAREA)
+                                          && area[d + 1] != Area.SEPARATIONGROUPS) {
+                                        setProtectedStone(d + 1);
+                                      } else {
+                                        if (check4Neighborhood(d - 1, Area.PROTECTEDAREA)
+                                            && area[d - 1] != Area.SEPARATIONGROUPS) {
+                                          setProtectedStone(d - 1);
+                                        } else {
+                                          if (check4Neighborhood(d + BOARDSIZE, Area.PROTECTEDAREA)
+                                              && area[d + BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                            setProtectedStone(d + BOARDSIZE);
+                                          } else {
+                                            if (check4Neighborhood(
+                                                    d - BOARDSIZE, Area.PROTECTEDAREA)
+                                                && area[d - BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                              setProtectedStone(d - BOARDSIZE);
+                                            } else {
+                                              printError(35);
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                    boolean[] checkBoard4 = new boolean[BOARDSIZE * BOARDSIZE];
+                                    connectToAreaAndChange(
+                                        d, checkBoard4, Area.PROTECTEDAREA, Stone.BLACK);
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
                       }
-                    } else {
-                      if (connectToArea(
-                              c, checkBoard, eyelessArea, Area.SEPARATIONGROUPS, Stone.WHITE)
-                          && connectToArea(
-                              c, checkBoard, eyelessArea, Area.EYESPACEWHITE, Stone.WHITE)) {
-                        // TODO
-                        printError(37);
-                      }
+                      Arrays.fill(eyelessArea, false);
                     }
-                    Arrays.fill(eyelessArea, false);
                   }
                 }
+                Arrays.fill(checkBoard, false);
               }
             }
           }
@@ -2596,6 +3166,7 @@ public class LocalAnalysis {
           Arrays.fill(checkBoard, false);
           if (!connectToArea2(a, checkBoard, eyelessArea, Area.EYESPACEWHITE, Stone.WHITE)) {
             Arrays.fill(checkBoard, false);
+            Arrays.fill(eyelessArea, false);
             if (!playerInsideBlack
                 ? !connectToArea2(a, checkBoard, eyelessArea, Area.SEPARATIONGROUPS, Stone.WHITE)
                 : !connectToArea2(a, checkBoard, eyelessArea, Area.PROTECTEDAREA, Stone.WHITE)) {
@@ -2622,25 +3193,85 @@ public class LocalAnalysis {
                   }
                   Arrays.fill(checkBoard, false);
                   for (int c = 0; c < BOARDSIZE * BOARDSIZE; c++) {
-                    if (!playerInsideBlack) {
-                      if (connectToArea(c, checkBoard, eyelessArea, Area.PROTECTEDAREA, Stone.BLACK)
-                          && connectToArea(
-                              c, checkBoard, eyelessArea, Area.EYESPACEBLACK, Stone.BLACK)) {
-                        // TODO
-                        printError(37);
+                    if (eyelessArea[c]) {
+                      Arrays.fill(checkBoard, false);
+                      if (!playerInsideBlack) {
+                        if (connectToArea(
+                                c, checkBoard, eyelessArea, Area.PROTECTEDAREA, Stone.BLACK)
+                            && connectToArea(
+                                c, checkBoard, eyelessArea, Area.EYESPACEBLACK, Stone.BLACK)) {
+                          // TODO
+                          printError(37);
+                        }
+                      } else {
+                        if (connectToArea(
+                                c, checkBoard, eyelessArea, Area.SEPARATIONGROUPS, Stone.BLACK)
+                            && connectToArea(
+                                c, checkBoard, eyelessArea, Area.EYESPACEBLACK, Stone.BLACK)) {
+                          placeBlackStones = false;
+                          for (int d = 0; d < BOARDSIZE * BOARDSIZE; d++) {
+                            if (area[d] == Area.MAINAREABLACK) {
+                              if (check4Neighborhood(d, Area.SEPARATIONGROUPS)) {
+                                setStone(d);
+                                boolean[] checkBoard3 = new boolean[BOARDSIZE * BOARDSIZE];
+                                if (!connectToAreaAndChange(
+                                    d, checkBoard3, Area.PROTECTEDAREA, Stone.WHITE)) {
+                                  boolean[] checkBoard2 = new boolean[BOARDSIZE * BOARDSIZE];
+                                  connectToAreaAndChange(
+                                      d, checkBoard2, Area.MAINAREAWHITE, Stone.WHITE);
+                                }
+                              }
+                            }
+                          }
+                          for (int d = 0; d < BOARDSIZE * BOARDSIZE; d++) {
+                            if (area[d] == Area.MAINAREABLACK) {
+                              if (check4Neighborhood(d, Area.SEPARATIONGROUPS)) {
+                                setStone(d);
+                                boolean[] checkBoard3 = new boolean[BOARDSIZE * BOARDSIZE];
+                                if (!connectToAreaAndChange(
+                                    d, checkBoard3, Area.PROTECTEDAREA, Stone.WHITE)) {
+                                  boolean[] checkBoard2 = new boolean[BOARDSIZE * BOARDSIZE];
+                                  if (!connectToAreaAndChange(
+                                      d, checkBoard2, Area.MAINAREAWHITE, Stone.WHITE)) {
+                                    if (!check4Neighborhood(d, Area.PROTECTEDAREA)) {
+                                      if (check4Neighborhood(d + 1, Area.PROTECTEDAREA)
+                                          && area[d + 1] != Area.SEPARATIONGROUPS) {
+                                        setProtectedStone(d + 1);
+                                      } else {
+                                        if (check4Neighborhood(d - 1, Area.PROTECTEDAREA)
+                                            && area[d - 1] != Area.SEPARATIONGROUPS) {
+                                          setProtectedStone(d - 1);
+                                        } else {
+                                          if (check4Neighborhood(d + BOARDSIZE, Area.PROTECTEDAREA)
+                                              && area[d + BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                            setProtectedStone(d + BOARDSIZE);
+                                          } else {
+                                            if (check4Neighborhood(
+                                                    d - BOARDSIZE, Area.PROTECTEDAREA)
+                                                && area[d - BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                              setProtectedStone(d - BOARDSIZE);
+                                            } else {
+                                              printError(34);
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                    boolean[] checkBoard4 = new boolean[BOARDSIZE * BOARDSIZE];
+                                    connectToAreaAndChange(
+                                        d, checkBoard4, Area.PROTECTEDAREA, Stone.WHITE);
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
                       }
-                    } else {
-                      if (connectToArea(
-                              c, checkBoard, eyelessArea, Area.SEPARATIONGROUPS, Stone.BLACK)
-                          && connectToArea(
-                              c, checkBoard, eyelessArea, Area.EYESPACEBLACK, Stone.BLACK)) {
-                        // TODO
-                        printError(37);
-                      }
+                      Arrays.fill(eyelessArea, false);
                     }
-                    Arrays.fill(eyelessArea, false);
                   }
                 }
+                Arrays.fill(checkBoard, false);
               }
               Arrays.fill(checkBoard, false);
             }
@@ -2650,6 +3281,7 @@ public class LocalAnalysis {
     }
   }
 
+  // TODO opposite borders for mirror
   /** searches in main areas space to make eyes */
   private void createEyeSpace() {
     if (!createEyeSpaceBlack()) {
@@ -2685,6 +3317,32 @@ public class LocalAnalysis {
       }
       if (checkSquareAndChange(
           BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE, 5, 3, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 3;
+        return true;
+      }
+      if (checkSquareAndChange(BOARDSIZE - 3, 3, 5, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 3;
+        return true;
+      }
+      if (checkSquareAndChange(BOARDSIZE - 5, 5, 3, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 3;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 4 * BOARDSIZE - 3,
+          3,
+          5,
+          Area.MAINAREABLACK,
+          Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 3;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE - 5,
+          5,
+          3,
+          Area.MAINAREABLACK,
+          Area.EYESPACEBLACK)) {
         maxKoThreatsWhite = 3;
         return true;
       }
@@ -2745,6 +3403,32 @@ public class LocalAnalysis {
         maxKoThreatsWhite = 2;
         return true;
       }
+      if (checkSquareAndChange(BOARDSIZE - 3, 3, 4, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 2;
+        return true;
+      }
+      if (checkSquareAndChange(BOARDSIZE - 4, 4, 3, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 2;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE - 3,
+          3,
+          4,
+          Area.MAINAREABLACK,
+          Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 2;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE - 4,
+          4,
+          3,
+          Area.MAINAREABLACK,
+          Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 2;
+        return true;
+      }
       for (int i = 0; i < BOARDSIZE; i++) {
         if (checkSquareAndChange(i * BOARDSIZE, 3, 5, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
           maxKoThreatsWhite = 2;
@@ -2776,6 +3460,28 @@ public class LocalAnalysis {
       }
       if (checkSquareAndChange(
           BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE, 5, 2, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 1;
+        return true;
+      }
+      if (checkSquareAndChange(BOARDSIZE - 2, 2, 5, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 1;
+        return true;
+      }
+      if (checkSquareAndChange(BOARDSIZE - 5, 5, 2, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 1;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 4 * BOARDSIZE - 2,
+          2,
+          5,
+          Area.MAINAREABLACK,
+          Area.EYESPACEBLACK)) {
+        maxKoThreatsWhite = 1;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - BOARDSIZE - 5, 5, 2, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
         maxKoThreatsWhite = 1;
         return true;
       }
@@ -2813,6 +3519,14 @@ public class LocalAnalysis {
         BOARDSIZE * BOARDSIZE - BOARDSIZE, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
       return true;
     }
+    if (checkSpaceForLivingGroupAndChangeType(
+        BOARDSIZE * BOARDSIZE - 1, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+      return true;
+    }
+    if (checkSpaceForLivingGroupAndChangeType(
+        BOARDSIZE - 1, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+      return true;
+    }
     for (int a = 0; a < BOARDSIZE * BOARDSIZE; a++) {
       if (isBorder(a)) {
         if (checkSpaceForLivingGroupAndChangeType(a, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
@@ -2845,7 +3559,7 @@ public class LocalAnalysis {
         return true;
       }
       if (checkSquareAndChange(
-          BOARDSIZE * BOARDSIZE - 5 * BOARDSIZE - 3,
+          BOARDSIZE * BOARDSIZE - 4 * BOARDSIZE - 3,
           3,
           5,
           Area.MAINAREAWHITE,
@@ -2854,11 +3568,29 @@ public class LocalAnalysis {
         return true;
       }
       if (checkSquareAndChange(
-          BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE - 5,
+          BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE - 5,
           5,
           3,
           Area.MAINAREAWHITE,
           Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 3;
+        return true;
+      }
+      if (checkSquareAndChange(0, 3, 5, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 3;
+        return true;
+      }
+      if (checkSquareAndChange(0, 5, 3, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 3;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 5 * BOARDSIZE, 3, 5, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 3;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE, 5, 3, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
         maxKoThreatsBlack = 3;
         return true;
       }
@@ -2912,7 +3644,7 @@ public class LocalAnalysis {
         return true;
       }
       if (checkSquareAndChange(
-          BOARDSIZE * BOARDSIZE - 4 * BOARDSIZE - 3,
+          BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE - 3,
           3,
           4,
           Area.MAINAREAWHITE,
@@ -2921,11 +3653,29 @@ public class LocalAnalysis {
         return true;
       }
       if (checkSquareAndChange(
-          BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE - 4,
+          BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE - 4,
           4,
           3,
           Area.MAINAREAWHITE,
           Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 2;
+        return true;
+      }
+      if (checkSquareAndChange(0, 3, 4, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 2;
+        return true;
+      }
+      if (checkSquareAndChange(0, 4, 3, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 2;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 4 * BOARDSIZE, 3, 4, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 2;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 3 * BOARDSIZE, 4, 3, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
         maxKoThreatsBlack = 2;
         return true;
       }
@@ -2955,7 +3705,7 @@ public class LocalAnalysis {
         return true;
       }
       if (checkSquareAndChange(
-          BOARDSIZE * BOARDSIZE - 5 * BOARDSIZE - 2,
+          BOARDSIZE * BOARDSIZE - 4 * BOARDSIZE - 2,
           2,
           5,
           Area.MAINAREAWHITE,
@@ -2964,11 +3714,25 @@ public class LocalAnalysis {
         return true;
       }
       if (checkSquareAndChange(
-          BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE - 5,
-          5,
-          2,
-          Area.MAINAREAWHITE,
-          Area.EYESPACEWHITE)) {
+          BOARDSIZE * BOARDSIZE - BOARDSIZE - 5, 5, 2, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 1;
+        return true;
+      }
+      if (checkSquareAndChange(0, 2, 5, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 1;
+        return true;
+      }
+      if (checkSquareAndChange(0, 5, 2, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 1;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 5 * BOARDSIZE, 2, 5, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+        maxKoThreatsBlack = 1;
+        return true;
+      }
+      if (checkSquareAndChange(
+          BOARDSIZE * BOARDSIZE - 2 * BOARDSIZE, 5, 2, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
         maxKoThreatsBlack = 1;
         return true;
       }
@@ -3009,9 +3773,16 @@ public class LocalAnalysis {
         BOARDSIZE - 1, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
       return true;
     }
+    if (checkSpaceForLivingGroupAndChangeType(0, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+      return true;
+    }
+    if (checkSpaceForLivingGroupAndChangeType(
+        BOARDSIZE * BOARDSIZE - BOARDSIZE, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
+      return true;
+    }
     for (int a = 0; a < BOARDSIZE * BOARDSIZE; a++) {
       if (isBorder(a)) {
-        if (checkSpaceForLivingGroupAndChangeType(a, Area.MAINAREABLACK, Area.EYESPACEBLACK)) {
+        if (checkSpaceForLivingGroupAndChangeType(a, Area.MAINAREAWHITE, Area.EYESPACEWHITE)) {
           return true;
         }
       }
@@ -3344,7 +4115,29 @@ public class LocalAnalysis {
                             && area[a - BOARDSIZE] != Area.SEPARATIONGROUPS) {
                           setProtectedStone(a - BOARDSIZE);
                         } else {
-                          printError(34);
+                          if (!check4Neighborhood(a, Area.MAINAREAWHITE)) {
+                            if (check4Neighborhood(a + 1, Area.MAINAREAWHITE)
+                                && area[a + 1] != Area.SEPARATIONGROUPS) {
+                              setProtectedStone(a + 1);
+                            } else {
+                              if (check4Neighborhood(a - 1, Area.MAINAREAWHITE)
+                                  && area[a - 1] != Area.SEPARATIONGROUPS) {
+                                setProtectedStone(a - 1);
+                              } else {
+                                if (check4Neighborhood(a + BOARDSIZE, Area.MAINAREAWHITE)
+                                    && area[a + BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                  setProtectedStone(a + BOARDSIZE);
+                                } else {
+                                  if (check4Neighborhood(a - BOARDSIZE, Area.MAINAREAWHITE)
+                                      && area[a - BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                    setProtectedStone(a - BOARDSIZE);
+                                  } else {
+
+                                  }
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -3477,7 +4270,29 @@ public class LocalAnalysis {
                             && area[a - BOARDSIZE] != Area.SEPARATIONGROUPS) {
                           setProtectedStone(a - BOARDSIZE);
                         } else {
-                          printError(35);
+                          if (!check4Neighborhood(a, Area.MAINAREABLACK)) {
+                            if (check4Neighborhood(a + 1, Area.MAINAREABLACK)
+                                && area[a + 1] != Area.SEPARATIONGROUPS) {
+                              setProtectedStone(a + 1);
+                            } else {
+                              if (check4Neighborhood(a - 1, Area.MAINAREABLACK)
+                                  && area[a - 1] != Area.SEPARATIONGROUPS) {
+                                setProtectedStone(a - 1);
+                              } else {
+                                if (check4Neighborhood(a + BOARDSIZE, Area.MAINAREABLACK)
+                                    && area[a + BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                  setProtectedStone(a + BOARDSIZE);
+                                } else {
+                                  if (check4Neighborhood(a - BOARDSIZE, Area.MAINAREABLACK)
+                                      && area[a - BOARDSIZE] != Area.SEPARATIONGROUPS) {
+                                    setProtectedStone(a - BOARDSIZE);
+                                  } else {
+
+                                  }
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -3526,6 +4341,44 @@ public class LocalAnalysis {
     return false;
   }
 
+  /**
+   * separates main area and protected area if they got inadvertent connected
+   *
+   * @param a starting point for separation
+   */
+  private boolean lateSeparation(int a) {
+    if (area[a] != Area.SEPARATIONGROUPS) {
+      return false;
+    }
+    Stone color = board[a];
+    Area areatype;
+    if (color == Stone.WHITE) areatype = Area.MAINAREABLACK;
+    else {
+      areatype = Area.MAINAREAWHITE;
+    }
+    int b = a + B;
+    while (isFieldInBoard(b)) {
+      if (area[b] != areatype) {
+        break;
+      }
+      b = b + B;
+    }
+    if (!isFieldInBoard(b)) {
+      return true;
+    }
+    b = a - B;
+    while (isFieldInBoard(b)) {
+      if (area[b] != areatype) {
+        break;
+      }
+      b = b - B;
+    }
+    if (!isFieldInBoard(b)) {
+      return true;
+    }
+    return false;
+  }
+
   /** restarts everything */
   private void restart() {
     if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode())
@@ -3535,15 +4388,12 @@ public class LocalAnalysis {
     for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++) {
       area[i] = Area.EMPTY;
     }
-
     copyBoard();
     protectFieldSquareAndSetWall(
         startCoordinates[0],
         startCoordinates[1]); // protects the selected area and sets corner points for the wall
     clearBoard(); // clear board except selected area
-
     buildEyesForWallAndAlivePoints(); // save marked stones and get wall alive
-
     // set main areas
     placeBlackStones = true;
     int a = 0;
@@ -3556,7 +4406,6 @@ public class LocalAnalysis {
         }
       }
     }
-
     placeBlackStones = false;
     for (int i = BOARDSIZE / 2 + BOARDSIZE % 2; i < BOARDSIZE; i++) { // white
       for (int j = 0; j < BOARDSIZE; j++) {
@@ -3576,16 +4425,18 @@ public class LocalAnalysis {
     if (!libertyCheck()) { // check if we have a legal board position
       printError(43);
     }
-    buildRealBoard(); // place the stones so we can see it
-
+    buildRealBoard(); // places the stones so we can see it
     Lizzie.frame.localAnalysisFrame.board.toggleAnalysis(); // start ponder
   }
 
   private void refreshBoard() {
     if (Lizzie.frame.localAnalysisFrame.board.inAnalysisMode())
       Lizzie.frame.localAnalysisFrame.board.toggleAnalysis(); // stop ponder while initiation
-    returnToGame();
+    int mirrorCopy = mirror;
+    mirror = 0; // we don't want to mirror the board
+    goToGameRoot();
     buildRealBoard();
+    mirror = mirrorCopy;
     Lizzie.frame.localAnalysisFrame.board.toggleAnalysis();
   }
 
@@ -3871,10 +4722,12 @@ public class LocalAnalysis {
     if (area[a] == areatype) {
       area[a] = changetype;
       board[a] = color;
-      changeAreaHelper(a + 1, checkBoard, areatype, changetype, color);
-      changeAreaHelper(a - 1, checkBoard, areatype, changetype, color);
-      changeAreaHelper(a + BOARDSIZE, checkBoard, areatype, changetype, color);
-      changeAreaHelper(a - BOARDSIZE, checkBoard, areatype, changetype, color);
+      if (xCoord(a) < BOARDSIZE - 1)
+        changeAreaHelper(a + 1, checkBoard, areatype, changetype, color);
+      if (xCoord(a) > 0) changeAreaHelper(a - 1, checkBoard, areatype, changetype, color);
+      if (yCoord(a) < BOARDSIZE - 1)
+        changeAreaHelper(a + BOARDSIZE, checkBoard, areatype, changetype, color);
+      if (yCoord(a) > 0) changeAreaHelper(a - BOARDSIZE, checkBoard, areatype, changetype, color);
       return;
     }
   }
@@ -3948,8 +4801,8 @@ public class LocalAnalysis {
   }
 
   /**
-   * checks if the stone is connected to another stone of type areatype. If so it will return true.
-   * ELSE it will mark all connected fields which we checked
+   * checks if the stone at a is connected to another stone of type areatype. If so it will return
+   * true. ELSE it will mark all connected fields which we checked
    *
    * @param checkBoard: all the fields we already have gone through
    * @param returnBoard: fields which are connected to a Stone of type areatpye
@@ -3962,10 +4815,10 @@ public class LocalAnalysis {
     if (checkBoard[a]) {
       return false;
     }
-    checkBoard[a] = true;
     if (board[a] != color) {
       return false;
     }
+    checkBoard[a] = true;
     if (area[a] == areatype) {
       return true;
     }
@@ -3979,6 +4832,42 @@ public class LocalAnalysis {
       return true;
     } else {
       returnBoard[a] = true;
+      return false;
+    }
+  }
+
+  /**
+   * checks if the stone at a is connected to another stone of type areatype. Also checks the stones
+   * of the opposite color at the border. Returns the first Points. If no such point found, it
+   * returns BOARDSIZE * BOARDSIZE.
+   *
+   * @param a: start point
+   * @param checkBoard: all the fields we already have gone through
+   * @param areatype: area type which we try to connect to
+   * @param color: color of stone at a
+   * @return position of the first stone of type areatype
+   */
+  private boolean connectToArea3(int a, boolean[] checkBoard, Area areatype, Stone color) {
+    if (!isFieldInBoard(a)) {
+      return false;
+    }
+    if (checkBoard[a]) {
+      return false;
+    }
+    checkBoard[a] = true;
+    if (area[a] == areatype) {
+      dummy = a;
+      return true;
+    }
+    if (board[a] != color) {
+      return false;
+    }
+    if ((xCoord(a) < BOARDSIZE - 1 && connectToArea3(a + 1, checkBoard, areatype, color))
+        || (xCoord(a) > 0 && connectToArea3(a - 1, checkBoard, areatype, color))
+        || (yCoord(a) < BOARDSIZE - 1 && connectToArea3(a + BOARDSIZE, checkBoard, areatype, color))
+        || (yCoord(a) > 0 && connectToArea3(a - BOARDSIZE, checkBoard, areatype, color))) {
+      return true;
+    } else {
       return false;
     }
   }
@@ -4036,6 +4925,19 @@ public class LocalAnalysis {
     } else {
       return a[0] + (BOARDSIZE - 1 - a[1]) * BOARDSIZE;
     }
+  }
+
+  /** @return a copy of board */
+  private boolean[] copyBooleanBoard(boolean[] board) {
+    if (board.length != B * B) {
+      printError(51);
+      return board;
+    }
+    boolean[] copy = new boolean[B * B];
+    for (int a = 0; a < B * B; a++) {
+      copy[a] = board[a];
+    }
+    return copy;
   }
 
   /** takes a field and tests if one of the 4 surrounding stones is from type areatype */
@@ -4610,11 +5512,11 @@ public class LocalAnalysis {
   }
 
   private void printInt(int a) {
-    Lizzie.frame.localAnalysisFrame.gtpConsole.addLine("number:" + a);
+    Lizzie.gtpConsole.addLine("number:" + a);
   }
 
   private void printBoard() {
-    Lizzie.frame.localAnalysisFrame.gtpConsole.addLine("_____________");
+    Lizzie.gtpConsole.addLine("_____________");
     StringBuilder[] stringbuilder = new StringBuilder[BOARDSIZE];
     for (int i = BOARDSIZE - 1; i >= 0; i--) {
       stringbuilder[i] = new StringBuilder(20);
@@ -4635,12 +5537,12 @@ public class LocalAnalysis {
         }
       }
 
-      Lizzie.frame.localAnalysisFrame.gtpConsole.addLine(stringbuilder[i].toString());
+      Lizzie.gtpConsole.addLine(stringbuilder[i].toString());
     }
   }
 
   private void printArea() {
-    Lizzie.frame.localAnalysisFrame.gtpConsole.addLine("_____________");
+    Lizzie.gtpConsole.addLine("_____________");
     StringBuilder[] stringbuilder = new StringBuilder[BOARDSIZE];
     for (int i = BOARDSIZE - 1; i >= 0; i--) {
       stringbuilder[i] = new StringBuilder(20);
@@ -4677,7 +5579,7 @@ public class LocalAnalysis {
         }
       }
 
-      Lizzie.frame.localAnalysisFrame.gtpConsole.addLine(stringbuilder[i].toString());
+      Lizzie.gtpConsole.addLine(stringbuilder[i].toString());
     }
   }
 }

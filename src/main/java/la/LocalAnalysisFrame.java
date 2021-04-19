@@ -335,13 +335,15 @@ public class LocalAnalysisFrame extends MainFrame {
     int change = 0;
 
     BoardHistoryNode node = board.getHistory().getCurrentHistoryNode();
-    if (!node.getData().bestMoves.isEmpty())
-      curScoreMean = node.getData().bestMoves.get(0).scoreMean;
-    else {
-      return;
-    }
 
     while (true) {
+      if (!node.getData().bestMoves.isEmpty())
+        if (Lizzie.config.kataGoScoreMeanAlwaysBlack || node.getData().blackToPlay)
+          curScoreMean = node.getData().bestMoves.get(0).scoreMean;
+        else curScoreMean = -node.getData().bestMoves.get(0).scoreMean;
+      else {
+        return;
+      }
       playouts = node.getData().getPlayouts();
       if (playouts == 0) {
         try {
@@ -388,7 +390,7 @@ public class LocalAnalysisFrame extends MainFrame {
 
       lastPlayouts = playouts;
       lastChange = change;
-      localAnalysis.moveBorder(change);
+      localAnalysis.changePoints(change);
     }
   }
   //  while (node.previous().isPresent()) {

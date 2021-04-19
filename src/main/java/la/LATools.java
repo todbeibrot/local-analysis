@@ -276,7 +276,7 @@ public class LATools extends JTabbedPane {
     bAddPointsPlus1.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.localAnalysisFrame.localAnalysis.moveBorder(1);
+            Lizzie.frame.localAnalysisFrame.localAnalysis.changePoints(1);
           }
         });
     bAddPointsPlus1.setEnabled(true);
@@ -286,7 +286,7 @@ public class LATools extends JTabbedPane {
     bAddPointsMinus1.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.localAnalysisFrame.localAnalysis.moveBorder(-1);
+            Lizzie.frame.localAnalysisFrame.localAnalysis.changePoints(-1);
           }
         });
     bAddPointsMinus1.setEnabled(true);
@@ -296,7 +296,7 @@ public class LATools extends JTabbedPane {
     bAddPointsPlus5.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.localAnalysisFrame.localAnalysis.moveBorder(5);
+            Lizzie.frame.localAnalysisFrame.localAnalysis.changePoints(5);
           }
         });
     bAddPointsPlus5.setEnabled(true);
@@ -306,7 +306,7 @@ public class LATools extends JTabbedPane {
     bAddPointsMinus5.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.localAnalysisFrame.localAnalysis.moveBorder(-5);
+            Lizzie.frame.localAnalysisFrame.localAnalysis.changePoints(-5);
           }
         });
     bAddPointsMinus5.setEnabled(true);
@@ -571,7 +571,7 @@ public class LATools extends JTabbedPane {
     } else {
       rdoPlayerToMoveWhite.setSelected(true);
     }
-    if (Lizzie.frame.localAnalysisFrame.localAnalysis.isBlackToMove()) {
+    if (allowKoThreats) {
       rdoAllowKoYes.setSelected(true);
       lblBlackKoThreats.setVisible(true);
       txtBlackKoThreats.setVisible(true);
