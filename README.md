@@ -1,5 +1,6 @@
 # Lizzie -Local Analysis
-This is an extension for [Lizzie](https://github.com/featurecat/lizzie). To use it open Lizzie and push **j**. 
+This is an extension for [Lizzie](https://github.com/featurecat/lizzie). To use it open Lizzie and push **j**.
+A new window should open. To start push **Space**.
 Now you can click on two fields on the board which will select the area and build a position in which 
 Katago is forced to think about the selected area. 
 The selectected rectangle will be cut off and the remaining area will be filled with stones.
